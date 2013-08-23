@@ -5,5 +5,5 @@ Feature: Edith
 
 	Scenario: Direct Browsing
 		Given Edith has her browser open
-		When Edith goes to the url directly
+		When she goes to the site directly
 		Then she should see "Angular JS" in the title

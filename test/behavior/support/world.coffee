@@ -1,9 +1,8 @@
 Zombie = require "zombie"
 
-class World
+module.exports = class World
 	constructor: ->
 		@browser = new Zombie()
-		@
 
 	visit: (url, cb)->
 		@browser.visit url, cb
@@ -11,4 +10,4 @@ class World
 	title: ->
 		@browser.text "title"
 
-module.exports = World
+

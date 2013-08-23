@@ -1,0 +1,17 @@
+{
+  "name": "tdd-angular",
+  "version": "0.0.0",
+  "description": "AngularJS application, written in a BDD/TDD style.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "author": "David Souther",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "zombie": "~2.0.0-alpha20",
+    "grunt-cucumber": "~0.2.1",
+    "should": "~1.2.2"
+  }
+}

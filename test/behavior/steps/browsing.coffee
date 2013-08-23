@@ -6,7 +6,7 @@ module.exports = ->
 		@world = new World()
 		cb()
 
-	@When /goes to the site directly$/, (callback) ->
+	@When /goes to the site(?: directly)?$/, (callback) ->
 		@world.visit "http://localhost:3000/", callback
 
 	@Then /should see "([^"]*)" in the title$/, (title, callback) ->

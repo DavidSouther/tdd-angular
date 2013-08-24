@@ -1,8 +1,9 @@
 express = require "express"
 app = express()
+path = require "path"
 
 app.get '/', (req, res)->
-	res.send "200", "<html><title>Angular JS</title></html>"
+	res.sendfile path.join __dirname, "..", "client", "index.html"
 
 module.exports =
 	serve: ->

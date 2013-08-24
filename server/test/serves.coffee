@@ -20,11 +20,8 @@ describe "Server", ->
 
 	it "returns an index page at /", (done)->
 		index done, (e, r, body)->
-			body.should.match ///
-					^<html>.*
-					</html>$
-				///,
-				"page needs basic HTML structure."
+			body.should.match /^<html>/
+			body.should.match /<\/html>$/
 
 	it "returns a page with a title", (done)->
 		index done, (e, r, body)->

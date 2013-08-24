@@ -1,6 +1,10 @@
+path = require "path"
 express = require "express"
 app = express()
-path = require "path"
+
+app.get '/bundle.js', (req, res)->
+	res.set "content-type", "text/javascript"
+	res.sendfile path.join __dirname, "..", "client", "bundle.js"
 
 app.get '/', (req, res)->
 	res.sendfile path.join __dirname, "..", "client", "index.html"

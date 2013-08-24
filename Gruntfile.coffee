@@ -1,5 +1,16 @@
 module.exports = (grunt)->
 	grunt.initConfig
+		browserify:
+			dev:
+				files: "client/bundle.js": ["client/main.coffee"]
+				options:
+					shim:
+						angular:
+							path: 'bower_components/angular/angular.js'
+							exports: 'angular'
+					transform: [
+						"caching-coffeeify"
+					]
 		mochaTest:
 			server:
 				options:
@@ -25,14 +36,23 @@ module.exports = (grunt)->
 
 	grunt.npmTasks = [
 		"grunt-cucumber"
+		"grunt-browserify"
 		"grunt-mocha-test"
 		"grunt-contrib-watch"
 	]
 
 	grunt.loadNpmTasks npmTask for npmTask in grunt.npmTasks
 
+	grunt.registerTask "build", [
+		"browserify:dev"
+	]
+
 	grunt.registerTask "test", [
 		"mochaTest:server"
 		"cucumberjs:Edith"
 	]
-	grunt.registerTask "default", ["test"]
+
+	grunt.registerTask "default", [
+		"build"
+		"test"
+	]

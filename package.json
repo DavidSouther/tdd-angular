@@ -4,7 +4,8 @@
   "description": "AngularJS application, written in a BDD/TDD style.",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "serve": "coffee -e \"require('./server/server').serve()\""
   },
   "author": "David Souther",
   "license": "MIT",
@@ -15,7 +16,10 @@
     "should": "~1.2.2",
     "grunt-mocha-test": "~0.6.3",
     "request": "~2.27.0",
-    "grunt-contrib-watch": "~0.5.2"
+    "grunt-contrib-watch": "~0.5.2",
+    "coffeeify": "~0.5.1",
+    "grunt-browserify": "~1.2.4",
+    "browserify-shim": "~2.0.8"
   },
   "dependencies": {
     "express": "~3.3.5"

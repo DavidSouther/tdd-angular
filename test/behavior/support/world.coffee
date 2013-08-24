@@ -4,10 +4,11 @@ module.exports = class World
 	constructor: ->
 		@browser = new Zombie()
 
-	visit: (url, cb)->
-		@browser.visit url, cb
+	visit: (url)->
+		@browser.visit(url)
 
-	title: ->
-		@browser.text "title"
+	find: (selector)->
+		@browser.document.querySelectorAll selector
 
-
+	text: (where)->
+		@browser.text where

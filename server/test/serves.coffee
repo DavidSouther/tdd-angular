@@ -29,3 +29,18 @@ describe "Server", ->
 					<title>[^<]*Angular\sJS[^<]*</title>
 				///,
 				"page needs a title"
+
+	it "returns a page with a header", (done)->
+		index done, (e, r, body)->
+			body.should.match /<header>/
+			body.should.match /<\/header>/
+
+	it "returns a page with input fields", (done)->
+		index done, (e, r, body)->
+			body.should.match /<input[^>]*>/
+
+	it "sets the placeholder on the input", (done)->
+		index done, (e, r, body)->
+			matches = body.match /<input[^>]+placeholder="([^"]+)"[^>]+\/>/
+			should.exist matches
+			matches[1].should.match /to-do/

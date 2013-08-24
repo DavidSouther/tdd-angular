@@ -22,8 +22,8 @@ Feature: Site loads
 
 	Scenario: First to-do
 		Given Edith is on the landing page
-		When she enters "Buy peacock feathers" into a "text" box
-		Then the page shows "1. Buy peackock feathres"
+		When she enters "Buy peacock feathers" into the "to-do" box
+		Then the page shows "1. Buy peacock feathers"
 
 	# Scenario: Second to-do
 	# 	Given Edith has entered a "to-do" item

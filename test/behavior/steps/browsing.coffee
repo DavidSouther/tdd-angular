@@ -37,3 +37,7 @@ module.exports = ->
 		placeholder.should.match ///#{value}///,
 			"Placeholder should be inviting."
 		callback()
+
+	@Then /page shows "([^"]+)"/, (content)->
+		text = @world.text("body")
+		text.should.match ///#{content}///

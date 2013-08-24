@@ -12,3 +12,6 @@ module.exports = class World
 
 	text: (where)->
 		@browser.text where
+
+	fill: (what, value)->
+		@browser.fill what, value

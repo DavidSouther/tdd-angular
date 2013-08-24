@@ -4,13 +4,24 @@ module.exports = (grunt)->
 			dev:
 				files: "client/bundle.js": ["client/main.coffee"]
 				options:
-					shim:
-						angular:
-							path: 'bower_components/angular/angular.js'
-							exports: 'angular'
+					debug: true
 					transform: [
 						"caching-coffeeify"
 					]
+
+		karma:
+			unit:
+				options:
+					browsers: ["PhantomJS"]
+					frameworks: ["jasmine"]
+					singleRun: true
+					files: [
+							"bower_components/angular/angular.js"
+							"bower_components/angular-mocks/angular-mocks.js"
+							"client/bundle.js"
+							"client/app/**/test.coffee"
+						]
+
 		mochaTest:
 			server:
 				options:
@@ -36,6 +47,7 @@ module.exports = (grunt)->
 
 	grunt.npmTasks = [
 		"grunt-cucumber"
+		"grunt-karma"
 		"grunt-browserify"
 		"grunt-mocha-test"
 		"grunt-contrib-watch"
@@ -49,6 +61,7 @@ module.exports = (grunt)->
 
 	grunt.registerTask "test", [
 		"mochaTest:server"
+		"karma:unit"
 		"cucumberjs:Edith"
 	]
 

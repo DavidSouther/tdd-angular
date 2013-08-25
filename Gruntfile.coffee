@@ -16,11 +16,11 @@ module.exports = (grunt)->
 					frameworks: ["jasmine"]
 					singleRun: true
 					files: [
-							"bower_components/angular/angular.js"
-							"bower_components/angular-mocks/angular-mocks.js"
-							"client/bundle.js"
-							"client/app/**/test.coffee"
-						]
+						"bower_components/angular/angular.js"
+						"bower_components/angular-mocks/angular-mocks.js"
+						"client/bundle.js"
+						"client/**/unit.coffee"
+					]
 
 		mochaTest:
 			server:

@@ -1,1 +1,1 @@
-todo = require "./app/todo.coffee"
+todo = require "./todo/module.coffee"

@@ -1,13 +1,20 @@
 <html>
 <head>
 	<title>To Do - Angular JS</title>
+	<script src="bower/angular/angular.js"></script>
+	<script src="bundle.js"></script>
 </head>
-<body>
+<body ng:app="todo">
 	<header>
 		<h1>To Do</h1>
 	</header>
-	<section>
-		<input type="text" name="to-do" placeholder="to-do" />
+	<section ng:controller="todo">
+		<form ng:submit="Todos.add()">
+			<input type="text" name="to-do" placeholder="to-do" ng:model="Todos.current" ng: />
+		</form>
+		<ol>
+			<li ng:repeat="todo in todos">{{todo}}</li>
+		</ol>
 	</section>
 </body>
 </html>

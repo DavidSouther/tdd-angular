@@ -55,7 +55,7 @@ describe "Server", ->
 				should.exist matches
 				matches[1].should.match /to-do/
 
-	describe "bundle.js", (done)->
+	describe "bundle.js", ->
 		it "returns a bundle", (done)->
 			bundle done, Callbacks.OK
 
@@ -68,3 +68,9 @@ describe "Server", ->
 				body.should.match ///
 					angular\.module\("todo"
 				///
+
+	describe "bower", ->
+		it "serves Bower resources", (done)->
+			request "http://localhost:3000/bower/angular/angular.js", (e, res)->
+				res.statusCode.should.equal 200
+				done()

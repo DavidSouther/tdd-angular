@@ -15,3 +15,7 @@ module.exports = class World
 
 	fill: (what, value)->
 		@browser.fill what, value
+
+	submit: (fieldName)->
+		field = @browser.document.querySelector "[name='#{fieldName}']"
+		field.form.submit()

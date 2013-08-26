@@ -10,9 +10,9 @@
 	</header>
 	<section ng:controller="todo">
 		<form ng:submit="Todos.add()">
-			<input type="text" name="to-do" placeholder="to-do" ng:model="Todos.current" ng: />
+			<input type="text" name="to-do" placeholder="to-do" ng:model="Todos.current" />
 		</form>
-		<ol>
+		<ol ng:cloak>
 			<li ng:repeat="todo in todos">{{todo}}</li>
 		</ol>
 	</section>

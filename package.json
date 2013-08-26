@@ -19,7 +19,12 @@
     "grunt-contrib-watch": "~0.5.2",
     "coffeeify": "~0.5.1",
     "grunt-browserify": "~1.2.4",
-    "mocha": "~1.12.0"
+    "mocha": "~1.12.0",
+    "selenium-webdriver": "~2.35.0",
+    "protractor": "~0.7.0",
+    "grunt-shell-spawn": "~0.2.4",
+    "selenium-launcher": "~1.1.7",
+    "q": "~0.9.6"
   },
   "dependencies": {
     "express": "~3.3.5"

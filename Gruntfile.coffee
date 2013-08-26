@@ -28,6 +28,22 @@ module.exports = (grunt)->
 					reporter: 'spec'
 				src: ["server/test/*coffee"]
 
+		shell:
+			kill:
+				command: "lsof -i TCP -P | grep 4444 | awk '{print $2}' | xargs -I{} kill {} >/dev/null  || exit 0"
+			selenium:
+				command: [
+					"java -jar ./selenium/selenium-server-standalone-2.34.0.jar "
+					"-Dwebdriver.chrome.driver=./selenium/chromedriver "
+					">/dev/null"
+				].join ' '
+				options:
+					async: true
+					kill: true
+			sleep:
+				command:
+					"sleep 1"
+
 		cucumberjs:
 			Edith:
 				files: src: ['test/behavior/users/edith']
@@ -38,6 +54,7 @@ module.exports = (grunt)->
 			all:
 				files: [
 					'test/**/*coffee'
+					'test/**/*feature'
 					'server/**/*coffee'
 					'client/**/*html'
 					'client/**/*coffee'
@@ -48,6 +65,7 @@ module.exports = (grunt)->
 	grunt.npmTasks = [
 		"grunt-cucumber"
 		"grunt-karma"
+		"grunt-shell-spawn"
 		"grunt-browserify"
 		"grunt-mocha-test"
 		"grunt-contrib-watch"
@@ -59,10 +77,19 @@ module.exports = (grunt)->
 		"browserify:dev"
 	]
 
+	grunt.registerTask "features", [
+		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
+		"shell:selenium"
+		"shell:sleep"
+		"cucumberjs:Edith"
+		"shell:selenium:kill" # Stop the selenium server
+		"shell:kill" # Also has the effect of killing driven browsers.
+	]
+
 	grunt.registerTask "test", [
 		"mochaTest:server"
 		"karma:unit"
-		"cucumberjs:Edith"
+		"features"
 	]
 
 	grunt.registerTask "default", [

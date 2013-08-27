@@ -1,0 +1,12 @@
+{
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular-mocks": "~1.0.8",
+    "angular": "~1.0.8"
+  },
+  "private": true
+}

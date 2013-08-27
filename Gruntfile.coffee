@@ -31,10 +31,13 @@ module.exports = (grunt)->
 		shell:
 			kill:
 				command: "lsof -i TCP -P | grep 4444 | awk '{print $2}' | xargs -I{} kill {} >/dev/null  || exit 0"
+			install:
+				command: "[ -f ./selenium/selenium-server-standalone-2.34.0.jar ] || ./node_modules/protractor/bin/install_selenium_standalone"
 			selenium:
 				command: [
-					"java -jar ./selenium/selenium-server-standalone-2.34.0.jar "
-					"-Dwebdriver.chrome.driver=./selenium/chromedriver "
+					"java -jar ./selenium/selenium-server-standalone-2.34.0.jar"
+					"-Dwebdriver.chrome.driver=./selenium/chromedriver"
+					"-log selenium.log -browserSideLog"
 					">/dev/null"
 				].join ' '
 				options:
@@ -79,10 +82,11 @@ module.exports = (grunt)->
 
 	grunt.registerTask "features", [
 		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
+		"shell:install"
 		"shell:selenium"
 		"shell:sleep"
 		"cucumberjs:Edith"
-		"shell:selenium:kill" # Stop the selenium server
+		"shell:selenium:kill"
 		"shell:kill" # Also has the effect of killing driven browsers.
 	]
 

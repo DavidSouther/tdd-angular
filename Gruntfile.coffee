@@ -81,6 +81,16 @@ module.exports = (grunt)->
 			options:
 				steps: 'src/features/behavior/steps'
 
+		uglify:
+			all:
+				files:
+					'build/bundle.min.js': ["build/bundle.js"]
+
+		cssmin:
+			all:
+				files:
+					'build/page.min.css': ["build/page.css"]
+
 		watch:
 			build:
 				files:[
@@ -106,9 +116,11 @@ module.exports = (grunt)->
 		"grunt-shell-spawn"
 		"grunt-browserify"
 		"grunt-mocha-test"
+		"grunt-contrib-cssmin"
 		"grunt-contrib-jade"
 		"grunt-contrib-less"
 		"grunt-contrib-watch"
+		"grunt-contrib-uglify"
 	]
 
 	grunt.loadNpmTasks npmTask for npmTask in grunt.npmTasks
@@ -145,7 +157,13 @@ module.exports = (grunt)->
 		"features"
 	]
 
+	grunt.registerTask "compress", [
+		"uglify:all"
+		"cssmin:all"
+	]
+
 	grunt.registerTask "default", [
 		"build"
 		"test"
+		"compress"
 	]

@@ -40,15 +40,15 @@ Feature: Site loads
 	# that the site has generated a unique URL for her -- there is some
 	# explanatory text to that effect.
 	Scenario: Saves list
-		Given Edith has entered a "to-do" item
+		Given Edith is on the landing page
+		And she enters into a "to-do" box
+			"""
+			Buy peacock feathers
+			Use peacock feathers to make a fly
+			"""
 		And she leaves the page
 		When she goes to the "saved" url
-		Then the page shows "Buy peackock feathers"
+		Then the page shows "Buy peacock feathers"
 		And the page shows "Use peacock feathers to make a fly"
 		And she should be invited to enter another "to-do" item
 		# Satisfied, she goes back to sleep
-
-	Scenario: More Features!
-		Given Edith has her browser open
-		When she goes to the site
-		Then she wants MORE FEATURES!

@@ -16,6 +16,9 @@ module.exports = class World
 	visit: (url)->
 		Q @ptor.get(url)
 
+	reload: ->
+		Q @ptor.reload()
+
 	find: (selector)->
 		@ptor.findElement By.css selector
 

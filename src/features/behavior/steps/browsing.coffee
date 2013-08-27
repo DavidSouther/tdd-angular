@@ -65,6 +65,9 @@ module.exports = ->
 			done()
 		.catch done 
 
+	###
+	Check for reasonable placeholder value
+	###
 	@Then /invited to enter a(?:nother)? "([^"]*)"/, (value, done)->
 		@world.placeholder("input[type=text]")
 		.then (placeholder)->
@@ -73,6 +76,9 @@ module.exports = ->
 			done()
 		.catch done
 
+	###
+	Check for content somewhere in the body.
+	###
 	@Then /page shows "([^"]+)"/, (content, done)->
 		@world.text("body")
 		.then (text)->

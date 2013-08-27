@@ -14,6 +14,13 @@ module.exports = (grunt)->
 				options:
 					browsers: ["PhantomJS"]
 					frameworks: ["jasmine"]
+					preprocessors:
+						"src/client/bundle.js": "coverage"
+						"src/**/*.coffee": "coffee"
+					reporters: [
+						'coverage'
+						'dots'
+					]
 					singleRun: true
 					files: [
 						"bower_components/angular/angular.js"

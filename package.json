@@ -24,7 +24,8 @@
     "selenium-webdriver": "~2.35.0",
     "should": "~1.2.2",
     "grunt-karma": "~0.6.2",
-    "phantomjs": "~1.9.1-8"
+    "phantomjs": "~1.9.1-8",
+    "karma-coverage": "~0.1.0"
   },
   "dependencies": {
     "express": "~3.3.5"

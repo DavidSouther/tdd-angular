@@ -2,13 +2,18 @@
 html
 	head
 		title To Do - Angular JS
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		link(rel="stylesheet", href="page.css", media="screen")
 		script(src='bower/angular/angular.js')
 		script(src='bundle.js')
 	body(ng:app='todo')
-		header
-			h1 To Do
-		section(ng:controller='todo')
-			form(ng:submit='Todos.add()')
-				input(type='text', name='to-do', placeholder='to-do', ng:model='Todos.current')
-			ol(ng:cloak='ng:cloak')
-				li(ng:repeat='todo in todos') {{todo}}
+		.container
+			.jumbotron
+				header
+					h1 To Do
+				section.row(ng:controller='todo')
+					.col-md-6.col-md-offset-3
+						form(ng:submit='Todos.add()')
+							input(type='text', id="to-do", name='to-do', placeholder='to-do', ng:model='Todos.current')
+						ol(ng:cloak='ng:cloak')
+							li(ng:repeat='todo in todos') {{todo}}

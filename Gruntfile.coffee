@@ -14,6 +14,15 @@ module.exports = (grunt)->
 				files:
 					"build/index.html": "src/client/index.jade"
 
+		less:
+			page:
+				options:
+					paths:[
+						"bower_components/bootstrap/less"
+					]
+				files:
+					"build/page.css": ["src/client/page.less"]
+
 		karma:
 			unit:
 				options:
@@ -60,18 +69,32 @@ module.exports = (grunt)->
 					"sleep 1"
 
 		cucumberjs:
-			users:
-				files: src: ['src/features/behavior/users/*']
+			all:
+				files:
+					src: ['src/features/behavior/users/*']
+			current:
+				files:
+					src: ['src/features/behavior/users/*']
+				options:
+					tags: '@current'
+
 			options:
 				steps: 'src/features/behavior/steps'
 
 		watch:
+			build:
+				files:[
+					'src/client/**/*jade'
+					'src/client/**/*coffee'
+					'src/client/**/*less'
+				]
+				tasks: ['build']
 			all:
 				files: [
 					'src/features/**/*coffee'
 					'src/features/**/*feature'
 					'src/server/**/*coffee'
-					'src/client/**/*html'
+					'src/client/**/*jade'
 					'src/client/**/*coffee'
 					'src/client/**/*less'
 				]
@@ -84,6 +107,7 @@ module.exports = (grunt)->
 		"grunt-browserify"
 		"grunt-mocha-test"
 		"grunt-contrib-jade"
+		"grunt-contrib-less"
 		"grunt-contrib-watch"
 	]
 
@@ -92,6 +116,7 @@ module.exports = (grunt)->
 	grunt.registerTask "build", [
 		"browserify:dev"
 		"jade:index"
+		"less:page"
 	]
 
 	grunt.registerTask "features", [
@@ -99,7 +124,17 @@ module.exports = (grunt)->
 		"shell:install"
 		"shell:selenium"
 		"shell:sleep"
-		"cucumberjs:users"
+		"cucumberjs:all"
+		"shell:selenium:kill"
+		"shell:kill" # Also has the effect of killing driven browsers.
+	]
+
+	grunt.registerTask "feature", [
+		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
+		"shell:install"
+		"shell:selenium"
+		"shell:sleep"
+		"cucumberjs:current"
 		"shell:selenium:kill"
 		"shell:kill" # Also has the effect of killing driven browsers.
 	]

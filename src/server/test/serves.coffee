@@ -7,8 +7,9 @@ get = (path, d, cb)->
 		cb e, r, b
 		d()
 
-index = (d, cb)-> get "http://localhost:3000/", d, cb
+index  = (d, cb)-> get "http://localhost:3000/", d, cb
 bundle = (d, cb)-> get "http://localhost:3000/bundle.js", d, cb
+styles = (d, cb)-> get "http://localhost:3000/page.css", d, cb
 
 Callbacks =
 	OK: (e, res)->
@@ -55,6 +56,10 @@ describe "Server", ->
 				should.exist matches
 				matches[1].should.match /to-do/
 
+		it "sets a viewport", (done)->
+			index done, (e, r, body)->
+				body.should.match /<meta[^>]+name="viewport"/
+
 	describe "bundle.js", ->
 		it "returns a bundle", (done)->
 			bundle done, Callbacks.OK
@@ -68,6 +73,14 @@ describe "Server", ->
 				body.should.match ///
 					angular\.module\("todo"
 				///
+
+	describe "page.css", ->
+		it "returns a stylesheet", (done)->
+			styles done, Callbacks.OK
+
+		it "returns a css bundle", (done)->
+			styles done, (e, res)->
+				res.headers["content-type"].should.equal "text/css"
 
 	describe "bower", ->
 		it "serves Bower resources", (done)->

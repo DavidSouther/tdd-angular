@@ -14,13 +14,24 @@ module.exports = ->
 	@Given /has (?:his|her|a) browser open$/, (done)->
 		done()
 
-	@Given /on the landing page/, (done)->
+	@Given /has entered a "([^"]*)" item/, (value, done)->
+		@world.visit("http://localhost:3000/")
+		.then(=>@world.fill(value, value, true))
+		.then(=>done())
+		.catch(done)
+
+	@Given /(?:on|goes to) the (?:site|landing page)(?: directly)?/, (done)->
 		@world.visit("http://localhost:3000/")
 		.then(done)
 
-	@When /goes to the (?:site|landing page)(?: directly)?/, (done) ->
+	@When /goes to the "([^"]*)" url/, (url, done)->
 		@world.visit("http://localhost:3000/")
 		.then(done)
+
+	@Given /leaves the page/, (done)->
+		# @world.reload()
+		@world.visit("http://localhost:3000/")
+		.then ->done()
 
 	@When /enters "([^"]+)" into (?:the|a) "([^"]+)" (?:box|input|field)/, (value, field, done)->
 		@world.fill(field, value, true)

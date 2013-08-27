@@ -2,7 +2,7 @@ module.exports = (grunt)->
 	grunt.initConfig
 		browserify:
 			dev:
-				files: "client/bundle.js": ["client/main.coffee"]
+				files: "src/client/bundle.js": ["src/client/main.coffee"]
 				options:
 					debug: true
 					transform: [
@@ -18,15 +18,15 @@ module.exports = (grunt)->
 					files: [
 						"bower_components/angular/angular.js"
 						"bower_components/angular-mocks/angular-mocks.js"
-						"client/bundle.js"
-						"client/**/unit.coffee"
+						"src/client/bundle.js"
+						"src/client/**/unit.coffee"
 					]
 
 		mochaTest:
 			server:
 				options:
 					reporter: 'spec'
-				src: ["server/test/*coffee"]
+				src: ["src/server/test/*coffee"]
 
 		shell:
 			kill:
@@ -37,7 +37,7 @@ module.exports = (grunt)->
 				command: [
 					"java -jar ./selenium/selenium-server-standalone-2.34.0.jar"
 					"-Dwebdriver.chrome.driver=./selenium/chromedriver"
-					"-log selenium.log -browserSideLog"
+					# "-log selenium.log -browserSideLog"
 					">/dev/null"
 				].join ' '
 				options:
@@ -49,19 +49,19 @@ module.exports = (grunt)->
 
 		cucumberjs:
 			Edith:
-				files: src: ['test/behavior/users/edith']
+				files: src: ['src/features/behavior/users/edith']
 				options:
-					steps: 'test/behavior/steps'
+					steps: 'src/features/behavior/steps'
 
 		watch:
 			all:
 				files: [
-					'test/**/*coffee'
-					'test/**/*feature'
-					'server/**/*coffee'
-					'client/**/*html'
-					'client/**/*coffee'
-					'client/**/*less'
+					'src/features/**/*coffee'
+					'src/features/**/*feature'
+					'src/server/**/*coffee'
+					'src/client/**/*html'
+					'src/client/**/*coffee'
+					'src/client/**/*less'
 				]
 				tasks: ['default']
 

@@ -4,7 +4,7 @@ World = require "../support/worlds"
 module.exports = ->
 	@Before (done)->
 		# opening a browser is like entering a whole new world...
-		@world = new World()
+		@world = World.get()
 		done()
 
 	@After (done)->
@@ -20,7 +20,7 @@ module.exports = ->
 		.then(=>done())
 		.catch(done)
 
-	@Given /(?:on|goes to) the (?:site|landing page)(?: directly)?/, (done)->
+	@Given /(?:on|goes to|visits) the (?:site|landing page)(?: directly)?/, (done)->
 		@world.visit("http://localhost:3000/")
 		.then(done)
 

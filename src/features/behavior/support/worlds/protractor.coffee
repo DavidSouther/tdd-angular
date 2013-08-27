@@ -4,6 +4,7 @@ webdriver = require "selenium-webdriver"
 Protractor = require "protractor"
 By = Protractor.By
 
+_destroyed = false
 module.exports = class World
 	constructor: ->
 		@driver = new webdriver.Builder().
@@ -39,5 +40,20 @@ module.exports = class World
 				input.submit()
 		Q deferred
 
+	coords: (elem)->
+		Q.all([
+			@find('html').getSize()
+			@find( elem ).getLocation()
+			@find( elem ).getSize()
+		]).spread (window, location, size)->
+			coords =
+				window: window
+				element:
+					width: size.width
+					left: location.x
+
 	destroy: (done)->
+		_destroyed = true
 		@driver.quit()
+
+	isDestroyed: -> _destroyed

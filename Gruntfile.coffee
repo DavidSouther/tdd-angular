@@ -2,7 +2,7 @@ module.exports = (grunt)->
 	grunt.initConfig
 		browserify:
 			dev:
-				files: "src/client/bundle.js": ["src/client/main.coffee"]
+				files: "build/bundle.js": ["src/client/main.coffee"]
 				options:
 					debug: true
 					transform: [
@@ -25,7 +25,7 @@ module.exports = (grunt)->
 					files: [
 						"bower_components/angular/angular.js"
 						"bower_components/angular-mocks/angular-mocks.js"
-						"src/client/bundle.js"
+						"build/bundle.js"
 						"src/client/**/unit.coffee"
 					]
 
@@ -55,10 +55,10 @@ module.exports = (grunt)->
 					"sleep 1"
 
 		cucumberjs:
-			Edith:
-				files: src: ['src/features/behavior/users/edith']
-				options:
-					steps: 'src/features/behavior/steps'
+			users:
+				files: src: ['src/features/behavior/users/*']
+			options:
+				steps: 'src/features/behavior/steps'
 
 		watch:
 			all:
@@ -92,7 +92,7 @@ module.exports = (grunt)->
 		"shell:install"
 		"shell:selenium"
 		"shell:sleep"
-		"cucumberjs:Edith"
+		"cucumberjs:users"
 		"shell:selenium:kill"
 		"shell:kill" # Also has the effect of killing driven browsers.
 	]

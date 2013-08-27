@@ -51,7 +51,7 @@ describe "Server", ->
 
 		it "sets the placeholder on the input", (done)->
 			index done, (e, r, body)->
-				matches = body.match /<input[^>]+placeholder="([^"]+)"[^>]+\/>/
+				matches = body.match /<input[^>]+placeholder="([^"]+)"/
 				should.exist matches
 				matches[1].should.match /to-do/
 

@@ -13,7 +13,7 @@ app.get '/bower/:module/:file', (req, res)->
 	res.sendfile path.join root, "bower_components", req.params.module, req.params.file
 
 app.get '/', (req, res)->
-	res.sendfile path.join __dirname, "..", "client", "index.html"
+	res.sendfile path.join root, "build", "index.html"
 
 module.exports =
 	serve: ->

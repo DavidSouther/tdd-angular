@@ -29,7 +29,7 @@ describe "Server", ->
 
 		it "returns an index page at /", (done)->
 			index done, (e, r, body)->
-				body.should.match /^<html>/
+				body.should.match /^<!DOCTYPE html><html>/
 				body.should.match /<\/html>$/
 
 	describe "index.html", ->

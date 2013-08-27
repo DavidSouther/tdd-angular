@@ -9,6 +9,11 @@ module.exports = (grunt)->
 						"caching-coffeeify"
 					]
 
+		jade:
+			index:
+				files:
+					"build/index.html": "src/client/index.jade"
+
 		karma:
 			unit:
 				options:
@@ -78,6 +83,7 @@ module.exports = (grunt)->
 		"grunt-shell-spawn"
 		"grunt-browserify"
 		"grunt-mocha-test"
+		"grunt-contrib-jade"
 		"grunt-contrib-watch"
 	]
 
@@ -85,6 +91,7 @@ module.exports = (grunt)->
 
 	grunt.registerTask "build", [
 		"browserify:dev"
+		"jade:index"
 	]
 
 	grunt.registerTask "features", [

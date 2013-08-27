@@ -1,0 +1,14 @@
+!!!
+html
+	head
+		title To Do - Angular JS
+		script(src='bower/angular/angular.js')
+		script(src='bundle.js')
+	body(ng:app='todo')
+		header
+			h1 To Do
+		section(ng:controller='todo')
+			form(ng:submit='Todos.add()')
+				input(type='text', name='to-do', placeholder='to-do', ng:model='Todos.current')
+			ol(ng:cloak='ng:cloak')
+				li(ng:repeat='todo in todos') {{todo}}

@@ -35,16 +35,15 @@ module.exports = (grunt)->
 				]
 				tasks: ['default']
 
-	grunt.registerTask "test", "Run all the tests.", [
-		"mochaTest:server"
-		"karma:unit"
-		"features"
-	]
-
 	grunt.registerTask "base", "Perform a base level of production, up to but not including features.", [
 		'build'
-		'mochaTest:server'
 		'karma:unit'
+		'mochaTest:server'
+	]
+
+	grunt.registerTask "test", "Run all the tests.", [
+		"base"
+		"features"
 	]
 
 	grunt.registerTask "compress", "Compress CSS and JS bundles.", [
@@ -54,7 +53,6 @@ module.exports = (grunt)->
 	]
 
 	grunt.registerTask "default", "Prepare the full project for deployment, including running all tests.", [
-		"build"
 		"test"
 		"compress"
 	]

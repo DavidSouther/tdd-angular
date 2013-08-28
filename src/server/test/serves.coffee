@@ -60,6 +60,10 @@ describe "Server", ->
 			index done, (e, r, body)->
 				body.should.match /<meta[^>]+name="viewport"/
 
+		it "has a link in the footer", (done)->
+			index done, (e, r, body)->
+				body.should.match /<a[^>]+href="[^"]+davidsouther.com/
+
 	describe "bundle.js", ->
 		it "returns a bundle", (done)->
 			bundle done, Callbacks.OK

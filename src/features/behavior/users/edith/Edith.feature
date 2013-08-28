@@ -48,9 +48,11 @@ Feature: Site loads
 		Then the page does not show "Buy peacock feathers"
 		And the page shows "Use peacock feathers to make a fly"
 
-	# Edith wonders whether the site will remember her list. Then she sees
-	# that the site has generated a unique URL for her -- there is some
-	# explanatory text to that effect.
+Feature: Todo lists save
+	As a user of our site
+	Edith wants the site to save her list
+	So that she can return to a list she made in the past
+
 	Scenario: Saves list
 		Given Edith is on the landing page
 		And she enters into a "to-do" box
@@ -64,3 +66,16 @@ Feature: Site loads
 		And the page shows "Use peacock feathers to make a fly"
 		And she should be invited to enter another "to-do" item
 		# Satisfied, she goes back to sleep
+
+	Scenario: Saves list after completing
+		Given Edith is on the landing page
+		And she enters into a "to-do" box
+			"""
+			Buy peacock feathers
+			Use peacock feathers to make a fly
+			"""
+		And she removes the first todo
+		And she leaves the page
+		When she goes to the "saved" url
+		Then the page does not show "Buy peacock feathers"
+		And the page shows "Use peacock feathers to make a fly"

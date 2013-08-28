@@ -6,13 +6,13 @@ By = Protractor.By
 
 _destroyed = false
 module.exports = class World
-	constructor: ->
+	constructor: (browser="firefox")->
 		@driver = new webdriver.Builder().
 			usingServer('http://localhost:4444/wd/hub').
-			withCapabilities(webdriver.Capabilities.firefox()).build();
+			withCapabilities(webdriver.Capabilities[browser]()).build()
 
-		@driver.manage().timeouts().setScriptTimeout(10000);
-		@ptor = Protractor.wrapDriver(@driver);
+		@driver.manage().timeouts().setScriptTimeout(100)
+		@ptor = Protractor.wrapDriver(@driver)
 
 	visit: (url)->
 		Q @ptor.get(url)
@@ -35,9 +35,7 @@ module.exports = class World
 	fill: (what, value, submit = false)->
 		input = @ptor.findElement(By.name(what))
 		deferred = input.sendKeys(value)
-		if submit
-			deferred.then ->
-				input.submit()
+		input.submit()  if submit
 		Q deferred
 
 	coords: (elem)->
@@ -51,6 +49,10 @@ module.exports = class World
 				element:
 					width: size.width
 					left: location.x
+
+	click: (what)->
+		debugger
+		Q @find(what).click()
 
 	destroy: (done)->
 		_destroyed = true

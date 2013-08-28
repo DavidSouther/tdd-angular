@@ -6,11 +6,11 @@ todo.service "storage", ->
 
 todo.controller "todo", ($scope, storage)->
 	$scope.todos = storage.get()
+	$scope.$watch 'todos', -> storage.set $scope.todos
 	Todos = $scope.Todos =
 		current: ""
-		add: ->
+		add: -> $scope.$apply ->
 			$scope.todos.push Todos.current
 			Todos.current = ""
-			storage.set $scope.todos
-		remove: (todo)->
+		remove: (todo)-> $scope.$apply ->
 			$scope.todos.splice $scope.todos.indexOf(todo), 1

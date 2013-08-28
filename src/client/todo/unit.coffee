@@ -21,6 +21,14 @@ describe "todo controller", ->
 		expect($scope.todos[0]).toEqual("Todo 1", "Correct Todo was added")
 		expect($scope.Todos.current).toEqual("", "Resets current todo")
 
+	it "can remove todo", ->
+		$scope.Todos.current = "Todo 1"
+		$scope.Todos.add()
+		$scope.Todos.current = "Todo 2"
+		$scope.Todos.add()
+		$scope.Todos.remove("Todo 1")
+		expect($scope.todos).toEqual(["Todo 2"], "One todo left.")
+
 	describe "localStorage", ->
 		it "saves to local storage", ->
 			$scope.Todos.current = "Todo 1"

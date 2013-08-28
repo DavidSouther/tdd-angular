@@ -12,3 +12,5 @@ todo.controller "todo", ($scope, storage)->
 			$scope.todos.push Todos.current
 			Todos.current = ""
 			storage.set $scope.todos
+		remove: (todo)->
+			$scope.todos.splice $scope.todos.indexOf(todo), 1

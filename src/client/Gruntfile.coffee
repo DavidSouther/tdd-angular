@@ -67,7 +67,7 @@ module.exports = (grunt)->
 		"grunt-contrib-watch"
 	]
 
-	grunt.registerTask "build", [
+	grunt.registerTask "build", "Compile various sources into three bundles.", [
 		"browserify:dev"
 		"jade:index"
 		"less:page"

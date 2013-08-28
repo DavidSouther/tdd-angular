@@ -22,6 +22,8 @@ module.exports = (grunt)->
 			all:
 				files:
 					src: ['src/features/behavior/users/*']
+				options:
+					tags: '~@broken'
 			current:
 				files:
 					src: ['src/features/behavior/users/*']
@@ -36,7 +38,7 @@ module.exports = (grunt)->
 		"grunt-shell-spawn"
 	]
 
-	grunt.registerTask "features", [
+	grunt.registerTask "features", "Run all feature behaviors, except those tagged @broken.", [
 		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
 		"shell:install"
 		"shell:selenium"
@@ -46,7 +48,7 @@ module.exports = (grunt)->
 		"shell:kill" # Also has the effect of killing driven browsers.
 	]
 
-	grunt.registerTask "feature", [
+	grunt.registerTask "feature", "Runs feature behaviors tagged @current.", [
 		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
 		"shell:install"
 		"shell:selenium"

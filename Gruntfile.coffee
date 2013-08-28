@@ -1,8 +1,19 @@
 module.exports = (grunt)->
 	require("./recurse")(grunt)
 
-	grunt.NpmTasks = [ "grunt-contrib-watch" ]
+	[
+		"./src/client"
+		"./src/server"
+		"./src/features"
+	].map grunt.grunt
 
+
+	###
+	The root Gruntfile simply manages several tasks, defined elsewhere.
+	It watches some types of files, and composes some high-level helper tasks.
+	###
+
+	grunt.NpmTasks = [ "grunt-contrib-watch" ]
 	grunt.Config =
 		watch:
 			base:
@@ -24,34 +35,29 @@ module.exports = (grunt)->
 				]
 				tasks: ['default']
 
-	[
-		"./src/client"
-		"./src/server"
-		"./src/features"
-	].map grunt.grunt
-
-	grunt.initConfig grunt.Config
-	grunt.loadNpmTasks npmTask for npmTask in grunt.NpmTasks
-
-	grunt.registerTask "test", [
+	grunt.registerTask "test", "Run all the tests.", [
 		"mochaTest:server"
 		"karma:unit"
 		"features"
 	]
 
-	grunt.registerTask "base", [
+	grunt.registerTask "base", "Perform a base level of production, up to but not including features.", [
 		'build'
 		'mochaTest:server'
 		'karma:unit'
 	]
 
-	grunt.registerTask "compress", [
+	grunt.registerTask "compress", "Compress CSS and JS bundles.", [
 		"uglify:all"
 		"cssmin:all"
+		# Modify index.html to use min files
 	]
 
-	grunt.registerTask "default", [
+	grunt.registerTask "default", "Prepare the full project for deployment, including running all tests.", [
 		"build"
 		"test"
 		"compress"
 	]
+
+	grunt.initConfig grunt.Config
+	grunt.loadNpmTasks npmTask for npmTask in grunt.NpmTasks

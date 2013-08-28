@@ -1,4 +1,3 @@
-@current
 Feature: Site looks nice
 	As a user of our side
 	Jason wants the site to be pleasant to use

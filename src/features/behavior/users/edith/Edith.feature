@@ -36,6 +36,18 @@ Feature: Site loads
 		And the page shows "Use peacock feathers to make a fly"
 		And she should be invited to enter another "to-do" item
 
+	@current
+	Scenario: Finishes a todo
+		Given Edith is on the landing page
+		And she enters into a "to-do" box
+			"""
+			Buy peacock feathers
+			Use peacock feathers to make a fly
+			"""
+		When she removes the first todo
+		Then the page does not show "Buy peacock feathers"
+		And the page shows "Use peacock feathers to make a fly"
+
 	# Edith wonders whether the site will remember her list. Then she sees
 	# that the site has generated a unique URL for her -- there is some
 	# explanatory text to that effect.

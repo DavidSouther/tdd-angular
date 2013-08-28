@@ -75,3 +75,13 @@ module.exports = ->
 			text.should.match ///#{content}///
 			done()
 		.catch done
+
+	###
+	Ensure lack of content in the body.
+	###
+	@Then /page does not show "([^"]+)"/, (content, done)->
+		@world.text("body")
+		.then (text)->
+			text.should.not.match ///#{content}///
+			done()
+		.catch done

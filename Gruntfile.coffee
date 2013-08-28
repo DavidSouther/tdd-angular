@@ -98,6 +98,14 @@ module.exports = (grunt)->
 					'src/client/**/*less'
 				]
 				tasks: ['build']
+			base:
+				files:[
+					'src/client/**/*jade'
+					'src/client/**/*coffee'
+					'src/client/**/*less'
+					'src/server/**/*coffee'
+				]
+				tasks: [ 'base' ]
 			all:
 				files: [
 					'src/features/**/*coffee'
@@ -154,6 +162,12 @@ module.exports = (grunt)->
 		"mochaTest:server"
 		"karma:unit"
 		"features"
+	]
+
+	grunt.registerTask "base", [
+		'build'
+		'mochaTest:server'
+		'karma:unit'
 	]
 
 	grunt.registerTask "compress", [

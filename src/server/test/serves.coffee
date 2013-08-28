@@ -91,3 +91,9 @@ describe "Server", ->
 			request "http://localhost:3000/bower/angular/angular.js", (e, res)->
 				res.statusCode.should.equal 200
 				done()
+
+	describe "fonts", ->
+		it "serves fonts from bootstrap", (done)->
+			request "http://localhost:3000/fonts/glyphicons-halflings-regular.woff", (e, res)->
+				res.statusCode.should.equal 200
+				done()

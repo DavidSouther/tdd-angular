@@ -16,6 +16,9 @@ app =
 			res.set "content-type", "text/css"
 			res.sendfile path.join root, "build", "page.css"
 
+		.get '/fonts/:font', (req, res)->
+			res.sendfile path.join root, "bower_components", "bootstrap", "fonts", req.params.font
+
 		.get '/bundle.js', (req, res)->
 			res.set "content-type", "text/javascript"
 			res.sendfile path.join root, "build", "bundle.js"

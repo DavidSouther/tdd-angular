@@ -17,6 +17,7 @@ describe "todo controller", ->
 	it "can add todo", ->
 		$scope.Todos.current = "Todo 1"
 		$scope.Todos.add()
+		$scope.$digest()
 		expect($scope.todos.length).toEqual(1, "After adding, todos has single todo")
 		expect($scope.todos[0]).toEqual("Todo 1", "Correct Todo was added")
 		expect($scope.Todos.current).toEqual("", "Resets current todo")
@@ -26,6 +27,7 @@ describe "todo controller", ->
 		$scope.Todos.add()
 		$scope.Todos.current = "Todo 2"
 		$scope.Todos.add()
+		$scope.$digest()
 		$scope.Todos.remove("Todo 1")
 		expect($scope.todos).toEqual(["Todo 2"], "One todo left.")
 
@@ -33,6 +35,7 @@ describe "todo controller", ->
 		it "saves to local storage", ->
 			$scope.Todos.current = "Todo 1"
 			$scope.Todos.add()
+			$scope.$digest()
 			expect(window.localStorage['TDD-ToDos']).toBeDefined("TDD-ToDos were created on localStorage")
 			stored = window.localStorage['TDD-ToDos']
 			expect(stored).toEqual('["Todo 1"]', "Saves array of todos")

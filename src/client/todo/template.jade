@@ -5,7 +5,7 @@ section.row(ng:controller='todo')
 		form(ng:submit='Todos.add()')
 			input(type='text', id="to-do", name='to-do', placeholder='to-do', ng:model='Todos.current')
 		ol(ng:cloak)
-			li(ng:repeat='todo in todos')
+			li.todo(ng:repeat='todo in todos')
 				| {{todo}}
 				button.remove.btn.btn-default.btn-sm.pull-right(ng:click="Todos.remove(todo)")
 					span.glyphicon.glyphicon-ok

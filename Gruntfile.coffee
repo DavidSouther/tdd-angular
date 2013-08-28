@@ -58,7 +58,6 @@ module.exports = (grunt)->
 				command: [
 					"java -jar ./selenium/selenium-server-standalone-2.34.0.jar"
 					"-Dwebdriver.chrome.driver=./selenium/chromedriver"
-					# "-log selenium.log -browserSideLog"
 					">/dev/null"
 				].join ' '
 				options:

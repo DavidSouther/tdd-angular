@@ -49,7 +49,7 @@ module.exports = (grunt)->
 	grunt.registerTask "compress", "Compress CSS and JS bundles.", [
 		"uglify:all"
 		"cssmin:all"
-		# Modify index.html to use min files
+		# TODO Modify index.html to use min files
 	]
 
 	grunt.registerTask "default", "Prepare the full project for deployment, including running all tests.", [

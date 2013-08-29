@@ -86,12 +86,6 @@ describe "Server", ->
 			styles done, (e, res)->
 				res.headers["content-type"].should.equal "text/css"
 
-	describe "bower", ->
-		it "serves Bower resources", (done)->
-			request "http://localhost:3000/bower/angular/angular.js", (e, res)->
-				res.statusCode.should.equal 200
-				done()
-
 	describe "fonts", ->
 		it "serves fonts from bootstrap", (done)->
 			request "http://localhost:3000/fonts/glyphicons-halflings-regular.woff", (e, res)->

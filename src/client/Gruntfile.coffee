@@ -35,8 +35,9 @@ module.exports = (grunt)->
 					]
 					singleRun: true
 					files: [
-						"bower_components/angular/angular.js"
-						"bower_components/angular-mocks/angular-mocks.js"
+						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js"
+						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-animate.js"
+						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-mocks.js"
 						"build/bundle.js"
 						"src/client/**/unit.coffee"
 					]

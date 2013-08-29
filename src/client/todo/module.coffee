@@ -1,18 +1,18 @@
-module.exports = todo = angular.module "todo", []
+module.exports = todo = angular.module "todo", ['ngAnimate']
 
 todo.service "storage", ->
 	get: -> JSON.parse window.localStorage["TDD-ToDos"] || '[]'
-	put: (TDs)-> window.localStorage["TDD-ToDos"] = JSON.stringify TDs
+	put: (TDs)-> window.localStorage["TDD-ToDos"] = JSON.stringify TDs || []
 
 todo.controller "todo", ($scope, storage)->
-	todos = $scope.todos = storage.get()
+	$scope.todos = storage.get()
 	save = (newV, oldV) ->
-		storage.put todos
+		storage.put $scope.todos
 	$scope.$watch 'todos', save, true
 	Todos = $scope.Todos =
 		current: ""
 		add: ->
-			todos.push Todos.current
+			$scope.todos.push Todos.current
 			Todos.current = ""
 		remove: (todo)->
-			todos.splice todos.indexOf(todo), 1
+			$scope.todos.splice $scope.todos.indexOf(todo), 1

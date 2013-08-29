@@ -4,11 +4,13 @@ html
 		title To Do - Angular JS
 		meta(name="viewport", content="width=device-width, initial-scale=1.0")
 		link(rel="stylesheet", href="page.css", media="screen")
-		script(src='bower/angular/angular.js')
+		//- script(src='bower/angular/angular.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.js')
+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-animate.js')
 		script(src='bundle.js')
 	body(ng:app='todo')
 		.container
-			.jumbotron
+			.jumbotron.well
 				include todo/template
 			footer
 				:markdown

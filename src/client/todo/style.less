@@ -5,15 +5,38 @@
     width: 100%;
 }
 
-.remove {
-	margin-top: 2px;
-	opacity: 0;
-	transition: all 0.3s 0.2s;
-}
-
-.todo:hover {
+.todo {
 	.remove {
+		margin-top: 2px;
+		opacity: 0;
+		.transition(all 0.1s ease 0s);
+	}
+	&:hover {
+		.remove {
+			opacity: 1;
+			.transition(all 0.3s ease 0.2s);
+		}
+	}
+
+	// Enter and exit animations
+	// Smooth fade in from slight angle
+	&.ng-enter { .transition(all 0.5s ease); }
+	&.ng-leave { .transition(all 0.2s ease); }
+	&.ng-leave {
+		.remove {
+			display: none;
+		}
+	}
+
+	&.ng-enter,
+	&.ng-leave.ng-leave-active {
+		opacity: 0;
+		.rotate(6deg);
+	}
+
+	&.ng-enter.ng-enter-active,
+	&.ng-leave {
 		opacity: 1;
-		transition: all 0.1s 0;
+		.rotate(0);
 	}
 }

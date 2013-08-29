@@ -4,16 +4,13 @@
   "description": "AngularJS application, written in a BDD/TDD style.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "./node_modules/bower/bin/bower install",
+    "postinstall": "node src/deploy/install.js",
     "test": "grunt test",
-    "start": "node start.js"
+    "start": "node src/deploy/start.js"
   },
   "author": "David Souther",
   "license": "MIT",
   "devDependencies": {
-    "caching-coffeeify": "~0.2.0",
-    "grunt": "~0.4.1",
-    "grunt-browserify": "~1.2.4",
     "grunt-contrib-watch": "~0.5.2",
     "grunt-cucumber": "~0.2.1",
     "grunt-mocha-test": "~0.6.3",
@@ -27,17 +24,21 @@
     "grunt-karma": "~0.6.2",
     "phantomjs": "~1.9.1-8",
     "karma-coverage": "~0.1.0",
+    "marked": "~0.2.9"
+  },
+  "dependencies": {
+    "caching-coffeeify": "~0.2.0",
+    "grunt": "~0.4.1",
+    "grunt-browserify": "~1.2.4",
+    "express": "~3.3.5",
+    "bower": "~1.2.5",
+    "nconf": "~0.6.7",
     "grunt-contrib-jade": "~0.8.0",
     "grunt-contrib-less": "~0.7.0",
     "grunt-contrib-cssmin": "~0.6.1",
     "grunt-contrib-uglify": "~0.2.2",
+    "coffee-script": "~1.6.3",
     "marked": "~0.2.9"
-  },
-  "dependencies": {
-    "express": "~3.3.5",
-    "bower": "~1.2.5",
-    "nconf": "~0.6.7",
-    "coffee-script": "~1.6.3"
   },
   "engines": {
     "node": "0.10.x",

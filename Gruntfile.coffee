@@ -1,5 +1,5 @@
 module.exports = (grunt)->
-	require("./recurse")(grunt)
+	require("./src/deploy/grunt/recurse")(grunt, __dirname)
 
 	[
 		"./src/client"

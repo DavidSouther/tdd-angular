@@ -1,6 +1,8 @@
-module.exports = (grunt)->
+Path = require "path"
+
+module.exports = (grunt, root)->
 	grunt.grunt = (path)->
-		other = require "#{path}/Gruntfile"
+		other = require "#{root}/#{path}/Gruntfile"
 		other(grunt)
 
 	Object.defineProperty grunt, "Config", do->

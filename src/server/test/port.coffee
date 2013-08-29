@@ -20,12 +20,12 @@ describe "Server", ->
 
 	before ->
 		_port = nconf.get "port"
-		nconf.set "port", 3030
+		nconf.set "PORT", 3030
 		server.serve()
 
 	after ->
 		server.stop()
-		nconf.set "port", _port
+		nconf.set "PORT", _port
 		_port = undefined
 
 	describe "/", ->

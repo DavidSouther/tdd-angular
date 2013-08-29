@@ -7,7 +7,7 @@ nconf.argv()
 	.file
 		file: path.join root, 'server.json'
 	.defaults
-		port: 3000
+		PORT: 3000
 
 express = require "express"
 app =
@@ -33,7 +33,7 @@ app =
 module.exports = do ->
 	server = null
 	serve: ->
-		port = nconf.get('port')
+		port = nconf.get('PORT')
 		server = app.listen port
 		console.log "ToDo Application Server listening on port #{port}"
 	stop: ->

@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "./node_modules/bower/bin/bower install",
     "test": "grunt test",
-    "start": "coffee -e \"require('./src/server/server').serve()\""
+    "start": "node start.js"
   },
   "author": "David Souther",
   "license": "MIT",
@@ -36,7 +36,8 @@
   "dependencies": {
     "express": "~3.3.5",
     "bower": "~1.2.5",
-    "nconf": "~0.6.7"
+    "nconf": "~0.6.7",
+    "coffee-script": "~1.6.3"
   },
   "engines": {
     "node": "0.10.x",

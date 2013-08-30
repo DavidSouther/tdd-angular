@@ -29,6 +29,13 @@ git add --force bower_components/angular/angular.js
 git add --force bower_components/bootstrap/fonts
 
 git commit -m 'Release'
+
+echo "Files in release:"
+git ls-files
+
 git push -f heroku master
+
+# Test against heroku
+SERVER=$(heroku apps:info | grep 'Web URL' | awk '{print $3}') grunt features
 
 fin

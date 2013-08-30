@@ -1,26 +1,29 @@
 Q = require 'q'
 should = require "should"
+
+server = process.env.SERVER || "http://localhost:3000/"
+
 module.exports = ->
 	@Given /has (?:his|her|a) browser open$/, (done)->
 		done()
 
 	@Given /has entered a "([^"]*)" item/, (value, done)->
-		@world.visit("http://localhost:3000/")
+		@world.visit(server)
 		.then(=>@world.fill(value, value, true))
 		.then(=>done())
 		.catch(done)
 
 	@Given /(?:on|goes to|visits) the (?:site|landing page)(?: directly)?/, (done)->
-		@world.visit("http://localhost:3000/")
+		@world.visit(server)
 		.then(done)
 
 	@When /goes to the "([^"]*)" url/, (url, done)->
-		@world.visit("http://localhost:3000/")
+		@world.visit(server)
 		.then(done)
 
 	@Given /leaves the page/, (done)->
 		# @world.reload()
-		@world.visit("http://localhost:3000/")
+		@world.visit(server)
 		.then ->done()
 
 	@When /enters "([^"]+)" into (?:the|a) "([^"]+)" (?:box|input|field)/, (value, field, done)->

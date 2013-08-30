@@ -11,7 +11,7 @@ module.exports = class World
 			usingServer('http://localhost:4444/wd/hub').
 			withCapabilities(webdriver.Capabilities[browser]()).build()
 
-		@driver.manage().timeouts().setScriptTimeout(1000)
+		@driver.manage().timeouts().setScriptTimeout(10000)
 		@ptor = Protractor.wrapDriver(@driver)
 
 	visit: (url)->

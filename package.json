@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "node src/deploy/install.js",
-    "test": "grunt test",
+    "test": "node src/deploy/test.js",
     "start": "node src/deploy/start.js"
   },
   "author": "David Souther",

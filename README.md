@@ -1,4 +1,5 @@
 ## BDD / TDD Angular
+[![Build Status](https://travis-ci.org/DavidSouther/tdd-angular.png)](https://travis-ci.org/DavidSouther/tdd-angular)
 
 [Obey the Testing Goat!](3)
 

@@ -1,7 +1,13 @@
 language: node_js
 node_js:
-  - "0.10"
-
+- '0.10'
 before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+deploy:
+  provider: heroku
+  api_key:
+    secure: cGrIXz0ZwnshOnasByfakIdtum9Sbef5RCRYaN2h/ovAzCyDty/+pOp6DOu/OvJrzyRs4EngO4scThLwwceT/bnzbBudWasvSQIkmcI8kILpJpwWFJ1Wn8oRM5x1euhrB7uBSDY3TvneAeZWPx/eJLm2fQpw5c1xonVyuzChBfc=
+  app: afternoon-savannah-7174
+  on:
+    repo: DavidSouther/tdd-angular

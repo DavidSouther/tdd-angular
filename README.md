@@ -28,6 +28,8 @@ The entire stack is Javascript, with one deploy script in bash that really shoul
 
 ![TDD Process with functional tests driving unit tests driving implementation. Credit Harry Percival / Test-Driven Web Development with Python][tdd]
 
+TDD Process with functional tests driving unit tests driving implementation. [Credit Harry Percival / Test-Driven Web Development with Python][tdd-cite]
+
 ### Where (is the code?)
 
 #### Source files
@@ -140,3 +142,4 @@ Copyright 2013 David Souther
 [23]: http://davidsouther.com/
 [24]: http://opensource.org/licenses/MIT
 [tdd]: http://orm-chimera-prod.s3.amazonaws.com/1234000000754/images/tdd_flowchart_functional_and_unit.png
+[tdd-cite]: http://chimera.labs.oreilly.com/books/1234000000754/ch04.html#_recap_the_tdd_process

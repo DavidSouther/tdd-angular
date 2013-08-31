@@ -50,7 +50,7 @@ pre {
 	background: linear-gradient(to bottom,  hsla(0,0%,90%,1) 0%,hsla(0,0%,100%,1) 20em); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 
-	padding: 1px 9px 0;
+	padding: 1px 9px 8px;
 }
 
 .commit h3 {
@@ -60,4 +60,21 @@ pre {
 .commit.minify p,
 .commit.minify pre {
 	display: none;
+}
+
+.commit h2:last-child {
+	text-align:right;
+}
+
+body {
+	padding-bottom: 19px;
+
+	background: #e5e5e5; /* Old browsers */
+	background: -moz-linear-gradient(bottom,  hsla(0,0%,90%,1) 0%, hsla(0,0%,100%,1) 10em); /* FF3.6+ */
+	background: -webkit-gradient(linear, left bottom, left top, color-stop(0%,hsla(0,0%,90%,1)), color-stop(20em,hsla(0,0%,100%,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(bottom,  hsla(0,0%,90%,1) 0%,hsla(0,0%,100%,1) 20em); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(bottom,  hsla(0,0%,90%,1) 0%,hsla(0,0%,100%,1) 20em); /* Opera 11.10+ */
+	background: -ms-linear-gradient(bottom,  hsla(0,0%,90%,1) 0%,hsla(0,0%,100%,1) 20em); /* IE10+ */
+	background: linear-gradient(to top,  hsla(0,0%,90%,1) 0%,hsla(0,0%,100%,1) 20em); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 }

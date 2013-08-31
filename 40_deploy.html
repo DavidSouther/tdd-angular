@@ -1,0 +1,1614 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript" src="scripts.js"></script>
+</head>
+
+<body>
+<div class="container"><div class="row"><div class="col-md-8 col-md-offset-2">
+
+	<h1><a href="http://www.obeythetestinggoat.com/">Obey the Testing Goat</a> <small>NodeJS edition!</small></h1>
+
+	<h2>Continuous Deployment</h2>
+
+	<p class="lead"></p>
+
+	<div class="commit">
+		<h3><span class="hash">c1cc8fa</span>  Recursive gruntfiles</h3>
+
+		<pre>
+			<span class="nrm">Gruntfile.coffee              | 145 </span><span class="add">+++</span><span class="rem">---------------------------------------</span>
+			<span class="nrm">recurse.coffee                |  20 </span><span class="add">++++++</span>
+			<span class="nrm">src/client/Gruntfile.coffee   |  74 </span><span class="add">+++++++++++++++++++++</span>
+			<span class="nrm">src/features/Gruntfile.coffee |   9 </span><span class="add">+++</span>
+			<span class="nrm">src/server/Gruntfile.coffee   |  59 </span><span class="add">+++++++++++++++++</span>
+			<span class="nrm">5 files changed, 172 insertions(+), 135 deletions(-)</span>
+
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,103 +1,10 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="rem">-	grunt.initConfig</span>
+			<span class="rem">-		browserify:</span>
+			<span class="rem">-			dev:</span>
+			<span class="rem">-				files: &quot;build/bundle.js&quot;: [&quot;src/client/main.coffee&quot;]</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					debug: true</span>
+			<span class="rem">-					transform: [</span>
+			<span class="rem">-						&quot;caching-coffeeify&quot;</span>
+			<span class="rem">-					]</span>
+			<span class="add">+	require(&quot;./recurse&quot;)(grunt)</span>
+
+			<span class="rem">-		jade:</span>
+			<span class="rem">-			index:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					&quot;build/index.html&quot;: &quot;src/client/index.jade&quot;</span>
+			<span class="rem">-</span>
+			<span class="rem">-		less:</span>
+			<span class="rem">-			page:</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					paths:[</span>
+			<span class="rem">-						&quot;bower_components/bootstrap/less&quot;</span>
+			<span class="rem">-					]</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					&quot;build/page.css&quot;: [&quot;src/client/page.less&quot;]</span>
+			<span class="rem">-</span>
+			<span class="rem">-		karma:</span>
+			<span class="rem">-			unit:</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					browsers: [&quot;PhantomJS&quot;]</span>
+			<span class="rem">-					frameworks: [&quot;jasmine&quot;]</span>
+			<span class="rem">-					preprocessors:</span>
+			<span class="rem">-						&quot;src/client/bundle.js&quot;: &quot;coverage&quot;</span>
+			<span class="rem">-						&quot;src/**/*.coffee&quot;: &quot;coffee&quot;</span>
+			<span class="rem">-					reporters: [</span>
+			<span class="rem">-						'coverage'</span>
+			<span class="rem">-						'dots'</span>
+			<span class="rem">-					]</span>
+			<span class="rem">-					singleRun: true</span>
+			<span class="rem">-					files: [</span>
+			<span class="rem">-						&quot;bower_components/angular/angular.js&quot;</span>
+			<span class="rem">-						&quot;bower_components/angular-mocks/angular-mocks.js&quot;</span>
+			<span class="rem">-						&quot;build/bundle.js&quot;</span>
+			<span class="rem">-						&quot;src/client/**/unit.coffee&quot;</span>
+			<span class="rem">-					]</span>
+			<span class="rem">-</span>
+			<span class="rem">-		mochaTest:</span>
+			<span class="rem">-			server:</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					reporter: 'spec'</span>
+			<span class="rem">-				src: [&quot;src/server/test/*coffee&quot;]</span>
+			<span class="rem">-</span>
+			<span class="rem">-		shell:</span>
+			<span class="rem">-			kill:</span>
+			<span class="rem">-				command: &quot;lsof -i TCP -P | grep 4444 | awk '{print $2}' | xargs -I{} kill {} &gt;/dev/null  || exit 0&quot;</span>
+			<span class="rem">-			install:</span>
+			<span class="rem">-				command: &quot;[ -f ./selenium/selenium-server-standalone-2.34.0.jar ] || ./node_modules/protractor/bin/install_selenium_standalone&quot;</span>
+			<span class="rem">-			selenium:</span>
+			<span class="rem">-				command: [</span>
+			<span class="rem">-					&quot;java -jar ./selenium/selenium-server-standalone-2.34.0.jar&quot;</span>
+			<span class="rem">-					&quot;-Dwebdriver.chrome.driver=./selenium/chromedriver&quot;</span>
+			<span class="rem">-					&quot;&gt;/dev/null&quot;</span>
+			<span class="rem">-				].join ' '</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					async: true</span>
+			<span class="rem">-					kill: true</span>
+			<span class="rem">-			sleep:</span>
+			<span class="rem">-				command:</span>
+			<span class="rem">-					&quot;sleep 1&quot;</span>
+			<span class="rem">-</span>
+			<span class="rem">-		cucumberjs:</span>
+			<span class="rem">-			all:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					src: ['src/features/behavior/users/*']</span>
+			<span class="rem">-			current:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					src: ['src/features/behavior/users/*']</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					tags: '@current'</span>
+			<span class="rem">-</span>
+			<span class="rem">-			options:</span>
+			<span class="rem">-				steps: 'src/features/behavior/steps'</span>
+			<span class="rem">-</span>
+			<span class="rem">-		uglify:</span>
+			<span class="rem">-			all:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					'build/bundle.min.js': [&quot;build/bundle.js&quot;]</span>
+			<span class="rem">-</span>
+			<span class="rem">-		cssmin:</span>
+			<span class="rem">-			all:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					'build/page.min.css': [&quot;build/page.css&quot;]</span>
+			<span class="add">+	grunt.NpmTasks = [ &quot;grunt-contrib-watch&quot; ]</span>
+
+			<span class="add">+	grunt.Config =</span>
+			<span class="nrm">		watch:</span>
+			<span class="rem">-			build:</span>
+			<span class="rem">-				files:[</span>
+			<span class="rem">-					'src/client/**/*jade'</span>
+			<span class="rem">-					'src/client/**/*coffee'</span>
+			<span class="rem">-					'src/client/**/*less'</span>
+			<span class="rem">-				]</span>
+			<span class="rem">-				tasks: ['build']</span>
+			<span class="nrm">			base:</span>
+			<span class="nrm">				files:[</span>
+			<span class="nrm">					'src/client/**/*jade'</span>
+			<span class="nfo">@@ -117,46 +24,14 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">				]</span>
+			<span class="nrm">				tasks: ['default']</span>
+
+			<span class="rem">-	grunt.npmTasks = [</span>
+			<span class="rem">-		&quot;grunt-cucumber&quot;</span>
+			<span class="rem">-		&quot;grunt-karma&quot;</span>
+			<span class="rem">-		&quot;grunt-shell-spawn&quot;</span>
+			<span class="rem">-		&quot;grunt-browserify&quot;</span>
+			<span class="rem">-		&quot;grunt-mocha-test&quot;</span>
+			<span class="rem">-		&quot;grunt-contrib-cssmin&quot;</span>
+			<span class="rem">-		&quot;grunt-contrib-jade&quot;</span>
+			<span class="rem">-		&quot;grunt-contrib-less&quot;</span>
+			<span class="rem">-		&quot;grunt-contrib-watch&quot;</span>
+			<span class="rem">-		&quot;grunt-contrib-uglify&quot;</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.loadNpmTasks npmTask for npmTask in grunt.npmTasks</span>
+			<span class="add">+	[</span>
+			<span class="add">+		&quot;./src/client&quot;</span>
+			<span class="add">+		&quot;./src/server&quot;</span>
+			<span class="add">+		&quot;./src/features&quot;</span>
+			<span class="add">+	].map grunt.grunt</span>
+
+			<span class="rem">-	grunt.registerTask &quot;build&quot;, [</span>
+			<span class="rem">-		&quot;browserify:dev&quot;</span>
+			<span class="rem">-		&quot;jade:index&quot;</span>
+			<span class="rem">-		&quot;less:page&quot;</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.registerTask &quot;features&quot;, [</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="rem">-		&quot;shell:install&quot;</span>
+			<span class="rem">-		&quot;shell:selenium&quot;</span>
+			<span class="rem">-		&quot;shell:sleep&quot;</span>
+			<span class="rem">-		&quot;cucumberjs:all&quot;</span>
+			<span class="rem">-		&quot;shell:selenium:kill&quot;</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.registerTask &quot;feature&quot;, [</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="rem">-		&quot;shell:install&quot;</span>
+			<span class="rem">-		&quot;shell:selenium&quot;</span>
+			<span class="rem">-		&quot;shell:sleep&quot;</span>
+			<span class="rem">-		&quot;cucumberjs:current&quot;</span>
+			<span class="rem">-		&quot;shell:selenium:kill&quot;</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="rem">-	]</span>
+			<span class="add">+	grunt.initConfig grunt.Config</span>
+			<span class="add">+	grunt.loadNpmTasks npmTask for npmTask in grunt.NpmTasks</span>
+			<span class="nrm"></span>
+			<span class="nrm">grunt.registerTask &quot;test&quot;, [</span>
+			<span class="nrm">		&quot;mochaTest:server&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/recurse.coffee b/recurse.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,20 @@</span>
+			<span class="add">+module.exports = (grunt)-&gt;</span>
+			<span class="add">+	grunt.grunt = (path)-&gt;</span>
+			<span class="add">+		other = require &quot;#{path}/Gruntfile&quot;</span>
+			<span class="add">+		other(grunt)</span>
+			<span class="add">+</span>
+			<span class="add">+	Object.defineProperty grunt, &quot;Config&quot;, do-&gt;</span>
+			<span class="add">+		_config = {}</span>
+			<span class="add">+		get: -&gt; _config</span>
+			<span class="add">+		set: (val)-&gt;</span>
+			<span class="add">+			for t, c of val</span>
+			<span class="add">+				_config[t] = _config[t] || {}</span>
+			<span class="add">+				for k, v of c</span>
+			<span class="add">+					_config[t][k] = v</span>
+			<span class="add">+			grunt</span>
+			<span class="add">+</span>
+			<span class="add">+	Object.defineProperty grunt, &quot;NpmTasks&quot;, do-&gt;</span>
+			<span class="add">+		_tasks = []</span>
+			<span class="add">+		get: -&gt; _tasks</span>
+			<span class="add">+		set: (val)-&gt;</span>
+			<span class="add">+			_tasks = _tasks.concat val</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/Gruntfile.coffee b/src/client/Gruntfile.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,74 @@</span>
+			<span class="add">+module.exports = (grunt)-&gt;</span>
+			<span class="add">+	grunt.Config =</span>
+			<span class="add">+		browserify:</span>
+			<span class="add">+			dev:</span>
+			<span class="add">+				files: &quot;build/bundle.js&quot;: [&quot;src/client/main.coffee&quot;]</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					debug: true</span>
+			<span class="add">+					transform: [</span>
+			<span class="add">+						&quot;caching-coffeeify&quot;</span>
+			<span class="add">+					]</span>
+			<span class="add">+</span>
+			<span class="add">+		jade:</span>
+			<span class="add">+			index: files: &quot;build/index.html&quot;: &quot;src/client/index.jade&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+		less:</span>
+			<span class="add">+			page:</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					paths: [</span>
+			<span class="add">+						&quot;bower_components/bootstrap/less&quot;</span>
+			<span class="add">+					]</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					&quot;build/page.css&quot;: [&quot;src/client/page.less&quot;]</span>
+			<span class="add">+</span>
+			<span class="add">+		karma:</span>
+			<span class="add">+			unit:</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					browsers: [&quot;PhantomJS&quot;]</span>
+			<span class="add">+					frameworks: [&quot;jasmine&quot;]</span>
+			<span class="add">+					preprocessors:</span>
+			<span class="add">+						&quot;src/client/bundle.js&quot;: &quot;coverage&quot;</span>
+			<span class="add">+						&quot;src/**/*.coffee&quot;: &quot;coffee&quot;</span>
+			<span class="add">+					reporters: [</span>
+			<span class="add">+						'coverage'</span>
+			<span class="add">+						'dots'</span>
+			<span class="add">+					]</span>
+			<span class="add">+					singleRun: true</span>
+			<span class="add">+					files: [</span>
+			<span class="add">+						&quot;bower_components/angular/angular.js&quot;</span>
+			<span class="add">+						&quot;bower_components/angular-mocks/angular-mocks.js&quot;</span>
+			<span class="add">+						&quot;build/bundle.js&quot;</span>
+			<span class="add">+						&quot;src/client/**/unit.coffee&quot;</span>
+			<span class="add">+					]</span>
+			<span class="add">+		uglify:</span>
+			<span class="add">+			all:</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					'build/bundle.min.js': [&quot;build/bundle.js&quot;]</span>
+			<span class="add">+</span>
+			<span class="add">+		cssmin:</span>
+			<span class="add">+			all: files: 'build/page.min.css': [&quot;build/page.css&quot;]</span>
+			<span class="add">+</span>
+			<span class="add">+		watch:</span>
+			<span class="add">+			build:</span>
+			<span class="add">+				files: [</span>
+			<span class="add">+					'src/client/**/*jade'</span>
+			<span class="add">+					'src/client/**/*coffee'</span>
+			<span class="add">+					'src/client/**/*less'</span>
+			<span class="add">+				]</span>
+			<span class="add">+				tasks: ['build']</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.NpmTasks = [</span>
+			<span class="add">+		&quot;grunt-browserify&quot;</span>
+			<span class="add">+		&quot;grunt-contrib-jade&quot;</span>
+			<span class="add">+		&quot;grunt-contrib-less&quot;</span>
+			<span class="add">+		&quot;grunt-karma&quot;</span>
+			<span class="add">+		&quot;grunt-contrib-uglify&quot;</span>
+			<span class="add">+		&quot;grunt-contrib-cssmin&quot;</span>
+			<span class="add">+		&quot;grunt-contrib-watch&quot;</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;build&quot;, [</span>
+			<span class="add">+		&quot;browserify:dev&quot;</span>
+			<span class="add">+		&quot;jade:index&quot;</span>
+			<span class="add">+		&quot;less:page&quot;</span>
+			<span class="add">+	]</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/Gruntfile.coffee b/src/features/Gruntfile.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,9 @@</span>
+			<span class="add">+module.exports = (grunt)-&gt;</span>
+			<span class="add">+	grunt.Config =</span>
+			<span class="add">+		mochaTest:</span>
+			<span class="add">+			server:</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					reporter: 'spec'</span>
+			<span class="add">+				src: [&quot;src/server/test/*coffee&quot;]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.NpmTasks.push &quot;grunt-mocha-test&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/Gruntfile.coffee b/src/server/Gruntfile.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,59 @@</span>
+			<span class="add">+module.exports = (grunt)-&gt;</span>
+			<span class="add">+	grunt.Config =</span>
+			<span class="add">+		shell:</span>
+			<span class="add">+			kill:</span>
+			<span class="add">+				command: &quot;lsof -i TCP -P | grep 4444 | awk '{print $2}' | xargs -I{} kill {} &gt;/dev/null  || exit 0&quot;</span>
+			<span class="add">+			install:</span>
+			<span class="add">+				command: &quot;[ -f ./selenium/selenium-server-standalone-2.34.0.jar ] || ./node_modules/protractor/bin/install_selenium_standalone&quot;</span>
+			<span class="add">+			selenium:</span>
+			<span class="add">+				command: [</span>
+			<span class="add">+					&quot;java -jar ./selenium/selenium-server-standalone-2.34.0.jar&quot;</span>
+			<span class="add">+					&quot;-Dwebdriver.chrome.driver=./selenium/chromedriver&quot;</span>
+			<span class="add">+					&quot;&gt;/dev/null&quot;</span>
+			<span class="add">+				].join ' '</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					async: true</span>
+			<span class="add">+					kill: true</span>
+			<span class="add">+			sleep:</span>
+			<span class="add">+				command:</span>
+			<span class="add">+					&quot;sleep 1&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+		cucumberjs:</span>
+			<span class="add">+			all:</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					src: ['src/features/behavior/users/*']</span>
+			<span class="add">+			current:</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					src: ['src/features/behavior/users/*']</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					tags: '@current'</span>
+			<span class="add">+</span>
+			<span class="add">+			options:</span>
+			<span class="add">+				steps: 'src/features/behavior/steps'</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.NpmTasks = [</span>
+			<span class="add">+		&quot;grunt-cucumber&quot;</span>
+			<span class="add">+		&quot;grunt-shell-spawn&quot;</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;features&quot;, [</span>
+			<span class="add">+		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="add">+		&quot;shell:install&quot;</span>
+			<span class="add">+		&quot;shell:selenium&quot;</span>
+			<span class="add">+		&quot;shell:sleep&quot;</span>
+			<span class="add">+		&quot;cucumberjs:all&quot;</span>
+			<span class="add">+		&quot;shell:selenium:kill&quot;</span>
+			<span class="add">+		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;feature&quot;, [</span>
+			<span class="add">+		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="add">+		&quot;shell:install&quot;</span>
+			<span class="add">+		&quot;shell:selenium&quot;</span>
+			<span class="add">+		# Start the application server</span>
+			<span class="add">+		&quot;shell:sleep&quot;</span>
+			<span class="add">+		&quot;cucumberjs:current&quot;</span>
+			<span class="add">+		# Stop the application server</span>
+			<span class="add">+		&quot;shell:selenium:kill&quot;</span>
+			<span class="add">+		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="add">+	]</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">2b61d1e</span>  Added descriptions for tasks.</h3>
+
+		<pre>
+			<span class="nrm">Gruntfile.coffee            | 34 </span><span class="add">++++++++++++++++++++</span><span class="rem">--------------</span>
+			<span class="nrm">src/client/Gruntfile.coffee |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">src/server/Gruntfile.coffee |  6 </span><span class="add">++++</span><span class="rem">--</span>
+			<span class="nrm">3 files changed, 25 insertions(+), 17 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,8 +1,19 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="nrm">	require(&quot;./recurse&quot;)(grunt)</span>
+
+			<span class="rem">-	grunt.NpmTasks = [ &quot;grunt-contrib-watch&quot; ]</span>
+			<span class="add">+	[</span>
+			<span class="add">+		&quot;./src/client&quot;</span>
+			<span class="add">+		&quot;./src/server&quot;</span>
+			<span class="add">+		&quot;./src/features&quot;</span>
+			<span class="add">+	].map grunt.grunt</span>
+
+			<span class="add">+</span>
+			<span class="add">+	###</span>
+			<span class="add">+	The root Gruntfile simply manages several tasks, defined elsewhere.</span>
+			<span class="add">+	It watches some types of files, and composes some high-level helper tasks.</span>
+			<span class="add">+	###</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.NpmTasks = [ &quot;grunt-contrib-watch&quot; ]</span>
+			<span class="nrm">	grunt.Config =</span>
+			<span class="nrm">		watch:</span>
+			<span class="nrm">			base:</span>
+			<span class="nfo">@@ -24,34 +35,29 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">				]</span>
+			<span class="nrm">				tasks: ['default']</span>
+
+			<span class="rem">-	[</span>
+			<span class="rem">-		&quot;./src/client&quot;</span>
+			<span class="rem">-		&quot;./src/server&quot;</span>
+			<span class="rem">-		&quot;./src/features&quot;</span>
+			<span class="rem">-	].map grunt.grunt</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.initConfig grunt.Config</span>
+			<span class="rem">-	grunt.loadNpmTasks npmTask for npmTask in grunt.NpmTasks</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.registerTask &quot;test&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;test&quot;, &quot;Run all the tests.&quot;, [</span>
+			<span class="nrm">		&quot;mochaTest:server&quot;</span>
+			<span class="nrm">		&quot;karma:unit&quot;</span>
+			<span class="nrm">		&quot;features&quot;</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;base&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;base&quot;, &quot;Perform a base level of production, up to but not including features.&quot;, [</span>
+			<span class="nrm">		'build'</span>
+			<span class="nrm">		'mochaTest:server'</span>
+			<span class="nrm">		'karma:unit'</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;compress&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;compress&quot;, &quot;Compress CSS and JS bundles.&quot;, [</span>
+			<span class="nrm">		&quot;uglify:all&quot;</span>
+			<span class="nrm">		&quot;cssmin:all&quot;</span>
+			<span class="add">+		# Modify index.html to use min files</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;default&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;default&quot;, &quot;Prepare the full project for deployment, including running all tests.&quot;, [</span>
+			<span class="nrm">		&quot;build&quot;</span>
+			<span class="nrm">		&quot;test&quot;</span>
+			<span class="nrm">		&quot;compress&quot;</span>
+			<span class="nrm">	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.initConfig grunt.Config</span>
+			<span class="add">+	grunt.loadNpmTasks npmTask for npmTask in grunt.NpmTasks</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/Gruntfile.coffee b/src/client/Gruntfile.coffee</span>
+			<span class="nfo">@@ -67,7 +67,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">		&quot;grunt-contrib-watch&quot;</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;build&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;build&quot;, &quot;Compile various sources into three bundles.&quot;, [</span>
+			<span class="nrm">		&quot;browserify:dev&quot;</span>
+			<span class="nrm">		&quot;jade:index&quot;</span>
+			<span class="nrm">		&quot;less:page&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/Gruntfile.coffee b/src/server/Gruntfile.coffee</span>
+			<span class="nfo">@@ -22,6 +22,8 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">			all:</span>
+			<span class="nrm">				files:</span>
+			<span class="nrm">					src: ['src/features/behavior/users/*']</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					tags: '~@broken'</span>
+			<span class="nrm">			current:</span>
+			<span class="nrm">				files:</span>
+			<span class="nrm">					src: ['src/features/behavior/users/*']</span>
+			<span class="nfo">@@ -36,7 +38,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">		&quot;grunt-shell-spawn&quot;</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;features&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;features&quot;, &quot;Run all feature behaviors, except those tagged @broken.&quot;, [</span>
+			<span class="nrm">		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="nrm">		&quot;shell:install&quot;</span>
+			<span class="nrm">		&quot;shell:selenium&quot;</span>
+			<span class="nfo">@@ -46,7 +48,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="nrm">	]</span>
+
+			<span class="rem">-	grunt.registerTask &quot;feature&quot;, [</span>
+			<span class="add">+	grunt.registerTask &quot;feature&quot;, &quot;Runs feature behaviors tagged @current.&quot;, [</span>
+			<span class="nrm">		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="nrm">		&quot;shell:install&quot;</span>
+			<span class="nrm">		&quot;shell:selenium&quot;</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">486408b</span>  Smooth task definitions.</h3>
+
+		<pre>
+			<span class="nrm">Gruntfile.coffee | 14 </span><span class="add">++++++</span><span class="rem">--------</span>
+			<span class="nrm">1 file changed, 6 insertions(+), 8 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -35,16 +35,15 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">				]</span>
+			<span class="nrm">				tasks: ['default']</span>
+
+			<span class="rem">-	grunt.registerTask &quot;test&quot;, &quot;Run all the tests.&quot;, [</span>
+			<span class="rem">-		&quot;mochaTest:server&quot;</span>
+			<span class="rem">-		&quot;karma:unit&quot;</span>
+			<span class="rem">-		&quot;features&quot;</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="nrm">	grunt.registerTask &quot;base&quot;, &quot;Perform a base level of production, up to but not including features.&quot;, [</span>
+			<span class="nrm">		'build'</span>
+			<span class="rem">-		'mochaTest:server'</span>
+			<span class="nrm">		'karma:unit'</span>
+			<span class="add">+		'mochaTest:server'</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;test&quot;, &quot;Run all the tests.&quot;, [</span>
+			<span class="add">+		&quot;base&quot;</span>
+			<span class="add">+		&quot;features&quot;</span>
+			<span class="nrm">	]</span>
+			<span class="nrm"></span>
+			<span class="nrm">grunt.registerTask &quot;compress&quot;, &quot;Compress CSS and JS bundles.&quot;, [</span>
+			<span class="nfo">@@ -54,7 +53,6 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">	]</span>
+			<span class="nrm"></span>
+			<span class="nrm">grunt.registerTask &quot;default&quot;, &quot;Prepare the full project for deployment, including running all tests.&quot;, [</span>
+			<span class="rem">-		&quot;build&quot;</span>
+			<span class="nrm">		&quot;test&quot;</span>
+			<span class="nrm">		&quot;compress&quot;</span>
+			<span class="nrm">	]</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">b236317</span>  Ready for Heroku</h3>
+
+		<pre>
+			<span class="nrm">Gruntfile.coffee |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">Procfile         |  1 </span><span class="add">+</span>
+			<span class="nrm">package.json     | 14 </span><span class="add">++++++++++</span><span class="rem">----</span>
+			<span class="nrm">3 files changed, 12 insertions(+), 5 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -49,7 +49,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">	grunt.registerTask &quot;compress&quot;, &quot;Compress CSS and JS bundles.&quot;, [</span>
+			<span class="nrm">		&quot;uglify:all&quot;</span>
+			<span class="nrm">		&quot;cssmin:all&quot;</span>
+			<span class="rem">-		# Modify index.html to use min files</span>
+			<span class="add">+		# TODO Modify index.html to use min files</span>
+			<span class="nrm">	]</span>
+			<span class="nrm"></span>
+			<span class="nrm">grunt.registerTask &quot;default&quot;, &quot;Prepare the full project for deployment, including running all tests.&quot;, [</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Procfile b/Procfile</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1 @@</span>
+			<span class="add">+web: npm start</span>
+			<span class="nrm">\ No newline at end of file</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/package.json b/package.json</span>
+			<span class="nfo">@@ -4,8 +4,9 @@</span>
+			<span class="nrm">&quot;description&quot;: &quot;AngularJS application, written in a BDD/TDD style.&quot;,</span>
+			<span class="nrm">&quot;main&quot;: &quot;index.js&quot;,</span>
+			<span class="nrm">&quot;scripts&quot;: {</span>
+			<span class="add">+    &quot;postinstall&quot;: &quot;./node_modules/bower/bin/bower install&quot;,</span>
+			<span class="nrm"> &quot;test&quot;: &quot;grunt test&quot;,</span>
+			<span class="rem">-    &quot;serve&quot;: &quot;coffee -e \&quot;require('./src/server/server').serve()\&quot;&quot;</span>
+			<span class="add">+    &quot;start&quot;: &quot;coffee -e \&quot;require('./src/server/server').serve()\&quot;&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;author&quot;: &quot;David Souther&quot;,</span>
+			<span class="nrm">&quot;license&quot;: &quot;MIT&quot;,</span>
+			<span class="nfo">@@ -30,10 +31,15 @@</span>
+			<span class="nrm"> &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-cssmin&quot;: &quot;~0.6.1&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-uglify&quot;: &quot;~0.2.2&quot;,</span>
+			<span class="rem">-    &quot;marked&quot;: &quot;~0.2.9&quot;,</span>
+			<span class="rem">-    &quot;nconf&quot;: &quot;~0.6.7&quot;</span>
+			<span class="add">+    &quot;marked&quot;: &quot;~0.2.9&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;dependencies&quot;: {</span>
+			<span class="rem">-    &quot;express&quot;: &quot;~3.3.5&quot;</span>
+			<span class="add">+    &quot;express&quot;: &quot;~3.3.5&quot;,</span>
+			<span class="add">+    &quot;bower&quot;: &quot;~1.2.5&quot;,</span>
+			<span class="add">+    &quot;nconf&quot;: &quot;~0.6.7&quot;</span>
+			<span class="add">+  },</span>
+			<span class="add">+  &quot;engines&quot;: {</span>
+			<span class="add">+    &quot;node&quot;: &quot;0.10.x&quot;,</span>
+			<span class="add">+    &quot;npm&quot;: &quot;1.2.x&quot;</span>
+		}
+		}
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">cb45d32</span>  Configured better for Heroku</h3>
+
+		<pre>
+			<span class="nrm">Procfile                    | 2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">package.json                | 5 </span><span class="add">+++</span><span class="rem">--</span>
+			<span class="nrm">src/server/server.coffee    | 4 </span><span class="add">++</span><span class="rem">--</span>
+			<span class="nrm">src/server/test/port.coffee | 4 </span><span class="add">++</span><span class="rem">--</span>
+			<span class="nrm">start.js                    | 2 </span><span class="add">++</span>
+			<span class="nrm">5 files changed, 10 insertions(+), 7 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Procfile b/Procfile</span>
+			<span class="nfo">@@ -1 +1 @@</span>
+			<span class="rem">-web: npm start</span>
+			<span class="nrm">\ No newline at end of file</span>
+			<span class="add">+web: node start.js</span>
+			<span class="nrm">\ No newline at end of file</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/package.json b/package.json</span>
+			<span class="nfo">@@ -6,7 +6,7 @@</span>
+			<span class="nrm">&quot;scripts&quot;: {</span>
+			<span class="nrm"> &quot;postinstall&quot;: &quot;./node_modules/bower/bin/bower install&quot;,</span>
+			<span class="nrm"> &quot;test&quot;: &quot;grunt test&quot;,</span>
+			<span class="rem">-    &quot;start&quot;: &quot;coffee -e \&quot;require('./src/server/server').serve()\&quot;&quot;</span>
+			<span class="add">+    &quot;start&quot;: &quot;node start.js&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;author&quot;: &quot;David Souther&quot;,</span>
+			<span class="nrm">&quot;license&quot;: &quot;MIT&quot;,</span>
+			<span class="nfo">@@ -36,7 +36,8 @@</span>
+			<span class="nrm">&quot;dependencies&quot;: {</span>
+			<span class="nrm"> &quot;express&quot;: &quot;~3.3.5&quot;,</span>
+			<span class="nrm"> &quot;bower&quot;: &quot;~1.2.5&quot;,</span>
+			<span class="rem">-    &quot;nconf&quot;: &quot;~0.6.7&quot;</span>
+			<span class="add">+    &quot;nconf&quot;: &quot;~0.6.7&quot;,</span>
+			<span class="add">+    &quot;coffee-script&quot;: &quot;~1.6.3&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;engines&quot;: {</span>
+			<span class="nrm"> &quot;node&quot;: &quot;0.10.x&quot;,</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
+			<span class="nfo">@@ -7,7 +7,7 @@</span> nconf.argv()
+			<span class="nrm">	.file</span>
+			<span class="nrm">		file: path.join root, 'server.json'</span>
+			<span class="nrm">	.defaults</span>
+			<span class="rem">-		port: 3000</span>
+			<span class="add">+		PORT: 3000</span>
+			<span class="nrm">
+		express = require &quot;express&quot;</span>
+			<span class="nrm">app =</span>
+			<span class="nfo">@@ -33,7 +33,7 @@</span> app =
+			<span class="nrm">module.exports = do -&gt;</span>
+			<span class="nrm">	server = null</span>
+			<span class="nrm">	serve: -&gt;</span>
+			<span class="rem">-		port = nconf.get('port')</span>
+			<span class="add">+		port = nconf.get('PORT')</span>
+			<span class="nrm">		server = app.listen port</span>
+			<span class="nrm">		console.log &quot;ToDo Application Server listening on port #{port}&quot;</span>
+			<span class="nrm">	stop: -&gt;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/test/port.coffee b/src/server/test/port.coffee</span>
+			<span class="nfo">@@ -20,12 +20,12 @@</span> describe &quot;Server&quot;, -&gt;
+			<span class="nrm"></span>
+			<span class="nrm">before -&gt;</span>
+			<span class="nrm">		_port = nconf.get &quot;port&quot;</span>
+			<span class="rem">-		nconf.set &quot;port&quot;, 3030</span>
+			<span class="add">+		nconf.set &quot;PORT&quot;, 3030</span>
+			<span class="nrm">		server.serve()</span>
+			<span class="nrm"></span>
+			<span class="nrm">after -&gt;</span>
+			<span class="nrm">		server.stop()</span>
+			<span class="rem">-		nconf.set &quot;port&quot;, _port</span>
+			<span class="add">+		nconf.set &quot;PORT&quot;, _port</span>
+			<span class="nrm">		_port = undefined</span>
+			<span class="nrm"></span>
+			<span class="nrm">describe &quot;/&quot;, -&gt;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/start.js b/start.js</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,2 @@</span>
+			<span class="add">+require(&quot;coffee-script&quot;);</span>
+			<span class="add">+require(&quot;./src/server/server&quot;).serve();</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">c684e83</span>  Updated configs across the board for Heroku.</h3>
+
+		<pre>
+			<span class="nrm">Gruntfile.coffee                                   |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">Procfile                                           |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">bower.json                                         |  5 </span><span class="add">+</span><span class="rem">----</span>
+			<span class="nrm">package.json                                       | 21 </span><span class="add">+++++++++++</span><span class="rem">----------</span>
+			<span class="nrm">recurse.coffee                                     | 20 </span><span class="rem">--------------------</span>
+			<span class="nrm">src/deploy/grunt/recurse.coffee                    | 22 </span><span class="add">++++++++++++++++++++++</span>
+			<span class="nrm">src/deploy/install.js                              |  7 </span><span class="add">+++++++</span>
+			<span class="nrm">src/deploy/start.js                                |  2 </span><span class="add">++</span>
+			<span class="nrm">.../behavior/support/worlds/protractor.coffee      |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">start.js                                           |  2 </span><span class="rem">--</span>
+			<span class="nrm">10 files changed, 46 insertions(+), 39 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,5 +1,5 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="rem">-	require(&quot;./recurse&quot;)(grunt)</span>
+			<span class="add">+	require(&quot;./src/deploy/grunt/recurse&quot;)(grunt, __dirname)</span>
+			<span class="nrm"></span>
+			<span class="nrm">[</span>
+			<span class="nrm">		&quot;./src/client&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/Procfile b/Procfile</span>
+			<span class="nfo">@@ -1 +1 @@</span>
+			<span class="rem">-web: node start.js</span>
+			<span class="nrm">\ No newline at end of file</span>
+			<span class="add">+web: node src/deploy/start.js</span>
+			<span class="nrm">\ No newline at end of file</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/bower.json b/bower.json</span>
+			<span class="nfo">@@ -11,8 +11,5 @@</span>
+			<span class="nrm"> &quot;angular&quot;: &quot;~1.0.8&quot;,</span>
+			<span class="nrm"> &quot;bootstrap&quot;: &quot;~3.0.0&quot;</span>
+			<span class="nrm">},</span>
+			<span class="rem">-  &quot;private&quot;: true,</span>
+			<span class="rem">-  &quot;devDependencies&quot;: {</span>
+			<span class="rem">-    &quot;bootstrap&quot;: &quot;~3.0.0&quot;</span>
+			<span class="rem">-  }</span>
+			<span class="add">+  &quot;private&quot;: true</span>
+		}
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/package.json b/package.json</span>
+			<span class="nfo">@@ -4,16 +4,13 @@</span>
+			<span class="nrm">&quot;description&quot;: &quot;AngularJS application, written in a BDD/TDD style.&quot;,</span>
+			<span class="nrm">&quot;main&quot;: &quot;index.js&quot;,</span>
+			<span class="nrm">&quot;scripts&quot;: {</span>
+			<span class="rem">-    &quot;postinstall&quot;: &quot;./node_modules/bower/bin/bower install&quot;,</span>
+			<span class="add">+    &quot;postinstall&quot;: &quot;node src/deploy/install.js&quot;,</span>
+			<span class="nrm"> &quot;test&quot;: &quot;grunt test&quot;,</span>
+			<span class="rem">-    &quot;start&quot;: &quot;node start.js&quot;</span>
+			<span class="add">+    &quot;start&quot;: &quot;node src/deploy/start.js&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;author&quot;: &quot;David Souther&quot;,</span>
+			<span class="nrm">&quot;license&quot;: &quot;MIT&quot;,</span>
+			<span class="nrm">&quot;devDependencies&quot;: {</span>
+			<span class="rem">-    &quot;caching-coffeeify&quot;: &quot;~0.2.0&quot;,</span>
+			<span class="rem">-    &quot;grunt&quot;: &quot;~0.4.1&quot;,</span>
+			<span class="rem">-    &quot;grunt-browserify&quot;: &quot;~1.2.4&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-watch&quot;: &quot;~0.5.2&quot;,</span>
+			<span class="nrm"> &quot;grunt-cucumber&quot;: &quot;~0.2.1&quot;,</span>
+			<span class="nrm"> &quot;grunt-mocha-test&quot;: &quot;~0.6.3&quot;,</span>
+			<span class="nfo">@@ -27,17 +24,21 @@</span>
+			<span class="nrm"> &quot;grunt-karma&quot;: &quot;~0.6.2&quot;,</span>
+			<span class="nrm"> &quot;phantomjs&quot;: &quot;~1.9.1-8&quot;,</span>
+			<span class="nrm"> &quot;karma-coverage&quot;: &quot;~0.1.0&quot;,</span>
+			<span class="rem">-    &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;,</span>
+			<span class="rem">-    &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;,</span>
+			<span class="rem">-    &quot;grunt-contrib-cssmin&quot;: &quot;~0.6.1&quot;,</span>
+			<span class="rem">-    &quot;grunt-contrib-uglify&quot;: &quot;~0.2.2&quot;,</span>
+			<span class="nrm"> &quot;marked&quot;: &quot;~0.2.9&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;dependencies&quot;: {</span>
+			<span class="add">+    &quot;caching-coffeeify&quot;: &quot;~0.2.0&quot;,</span>
+			<span class="add">+    &quot;grunt&quot;: &quot;~0.4.1&quot;,</span>
+			<span class="add">+    &quot;grunt-browserify&quot;: &quot;~1.2.4&quot;,</span>
+			<span class="nrm"> &quot;express&quot;: &quot;~3.3.5&quot;,</span>
+			<span class="nrm"> &quot;bower&quot;: &quot;~1.2.5&quot;,</span>
+			<span class="nrm"> &quot;nconf&quot;: &quot;~0.6.7&quot;,</span>
+			<span class="rem">-    &quot;coffee-script&quot;: &quot;~1.6.3&quot;</span>
+			<span class="add">+    &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;,</span>
+			<span class="add">+    &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;,</span>
+			<span class="add">+    &quot;grunt-contrib-cssmin&quot;: &quot;~0.6.1&quot;,</span>
+			<span class="add">+    &quot;grunt-contrib-uglify&quot;: &quot;~0.2.2&quot;,</span>
+			<span class="add">+    &quot;coffee-script&quot;: &quot;~1.6.3&quot;,</span>
+			<span class="add">+    &quot;marked&quot;: &quot;~0.2.9&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;engines&quot;: {</span>
+			<span class="nrm"> &quot;node&quot;: &quot;0.10.x&quot;,</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/recurse.coffee b/recurse.coffee</span>
+			<span class="wrn">deleted file mode 100644</span>
+			<span class="nfo">@@ -1,20 +0,0 @@</span>
+			<span class="rem">-module.exports = (grunt)-&gt;</span>
+			<span class="rem">-	grunt.grunt = (path)-&gt;</span>
+			<span class="rem">-		other = require &quot;#{path}/Gruntfile&quot;</span>
+			<span class="rem">-		other(grunt)</span>
+			<span class="rem">-</span>
+			<span class="rem">-	Object.defineProperty grunt, &quot;Config&quot;, do-&gt;</span>
+			<span class="rem">-		_config = {}</span>
+			<span class="rem">-		get: -&gt; _config</span>
+			<span class="rem">-		set: (val)-&gt;</span>
+			<span class="rem">-			for t, c of val</span>
+			<span class="rem">-				_config[t] = _config[t] || {}</span>
+			<span class="rem">-				for k, v of c</span>
+			<span class="rem">-					_config[t][k] = v</span>
+			<span class="rem">-			grunt</span>
+			<span class="rem">-</span>
+			<span class="rem">-	Object.defineProperty grunt, &quot;NpmTasks&quot;, do-&gt;</span>
+			<span class="rem">-		_tasks = []</span>
+			<span class="rem">-		get: -&gt; _tasks</span>
+			<span class="rem">-		set: (val)-&gt;</span>
+			<span class="rem">-			_tasks = _tasks.concat val</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/grunt/recurse.coffee b/src/deploy/grunt/recurse.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,22 @@</span>
+			<span class="add">+Path = require &quot;path&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+module.exports = (grunt, root)-&gt;</span>
+			<span class="add">+	grunt.grunt = (path)-&gt;</span>
+			<span class="add">+		other = require &quot;#{root}/#{path}/Gruntfile&quot;</span>
+			<span class="add">+		other(grunt)</span>
+			<span class="add">+</span>
+			<span class="add">+	Object.defineProperty grunt, &quot;Config&quot;, do-&gt;</span>
+			<span class="add">+		_config = {}</span>
+			<span class="add">+		get: -&gt; _config</span>
+			<span class="add">+		set: (val)-&gt;</span>
+			<span class="add">+			for t, c of val</span>
+			<span class="add">+				_config[t] = _config[t] || {}</span>
+			<span class="add">+				for k, v of c</span>
+			<span class="add">+					_config[t][k] = v</span>
+			<span class="add">+			grunt</span>
+			<span class="add">+</span>
+			<span class="add">+	Object.defineProperty grunt, &quot;NpmTasks&quot;, do-&gt;</span>
+			<span class="add">+		_tasks = []</span>
+			<span class="add">+		get: -&gt; _tasks</span>
+			<span class="add">+		set: (val)-&gt;</span>
+			<span class="add">+			_tasks = _tasks.concat val</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/install.js b/src/deploy/install.js</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,7 @@</span>
+			<span class="add">+require(&quot;bower&quot;)</span>
+			<span class="add">+.commands</span>
+			<span class="add">+.install()</span>
+			<span class="add">+.on('end', function (installed) {</span>
+			<span class="add">+	console.log(installed);</span>
+			<span class="add">+	require(&quot;grunt&quot;).tasks(&quot;build&quot;);</span>
+			<span class="add">+});</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/start.js b/src/deploy/start.js</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,2 @@</span>
+			<span class="add">+require(&quot;coffee-script&quot;);</span>
+			<span class="add">+require(&quot;../server/server&quot;).serve();</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/support/worlds/protractor.coffee b/src/features/behavior/support/worlds/protractor.coffee</span>
+			<span class="nfo">@@ -11,7 +11,7 @@</span> module.exports = class World
+			<span class="nrm">			usingServer('http://localhost:4444/wd/hub').</span>
+			<span class="nrm">			withCapabilities(webdriver.Capabilities[browser]()).build()</span>
+
+			<span class="rem">-		@driver.manage().timeouts().setScriptTimeout(100)</span>
+			<span class="add">+		@driver.manage().timeouts().setScriptTimeout(1000)</span>
+			<span class="nrm">		@ptor = Protractor.wrapDriver(@driver)</span>
+			<span class="nrm"></span>
+			<span class="nrm">visit: (url)-&gt;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/start.js b/start.js</span>
+			<span class="wrn">deleted file mode 100644</span>
+			<span class="nfo">@@ -1,2 +0,0 @@</span>
+			<span class="rem">-require(&quot;coffee-script&quot;);</span>
+			<span class="rem">-require(&quot;./src/server/server&quot;).serve();</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">f56a1b1</span>  Basic heroku release scripts.</h3>
+
+		<pre>
+			<span class="nrm">package.json               | 19 </span><span class="add">+++++++++</span><span class="rem">----------</span>
+			<span class="nrm">src/client/todo/style.less |  3 </span><span class="add">++</span><span class="rem">-</span>
+			<span class="nrm">src/deploy/install.js      |  1 </span><span class="rem">-</span>
+			<span class="nrm">src/deploy/release.sh      | 34 </span><span class="add">++++++++++++++++++++++++++++++++++</span>
+			<span class="nrm">4 files changed, 45 insertions(+), 12 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/package.json b/package.json</span>
+			<span class="nfo">@@ -11,6 +11,9 @@</span>
+			<span class="nrm">&quot;author&quot;: &quot;David Souther&quot;,</span>
+			<span class="nrm">&quot;license&quot;: &quot;MIT&quot;,</span>
+			<span class="nrm">&quot;devDependencies&quot;: {</span>
+			<span class="add">+    &quot;caching-coffeeify&quot;: &quot;~0.2.0&quot;,</span>
+			<span class="add">+    &quot;grunt&quot;: &quot;~0.4.1&quot;,</span>
+			<span class="add">+    &quot;grunt-browserify&quot;: &quot;~1.2.4&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-watch&quot;: &quot;~0.5.2&quot;,</span>
+			<span class="nrm"> &quot;grunt-cucumber&quot;: &quot;~0.2.1&quot;,</span>
+			<span class="nrm"> &quot;grunt-mocha-test&quot;: &quot;~0.6.3&quot;,</span>
+			<span class="nfo">@@ -24,22 +27,18 @@</span>
+			<span class="nrm"> &quot;grunt-karma&quot;: &quot;~0.6.2&quot;,</span>
+			<span class="nrm"> &quot;phantomjs&quot;: &quot;~1.9.1-8&quot;,</span>
+			<span class="nrm"> &quot;karma-coverage&quot;: &quot;~0.1.0&quot;,</span>
+			<span class="rem">-    &quot;marked&quot;: &quot;~0.2.9&quot;</span>
+			<span class="rem">-  },</span>
+			<span class="rem">-  &quot;dependencies&quot;: {</span>
+			<span class="rem">-    &quot;caching-coffeeify&quot;: &quot;~0.2.0&quot;,</span>
+			<span class="rem">-    &quot;grunt&quot;: &quot;~0.4.1&quot;,</span>
+			<span class="rem">-    &quot;grunt-browserify&quot;: &quot;~1.2.4&quot;,</span>
+			<span class="rem">-    &quot;express&quot;: &quot;~3.3.5&quot;,</span>
+			<span class="rem">-    &quot;bower&quot;: &quot;~1.2.5&quot;,</span>
+			<span class="rem">-    &quot;nconf&quot;: &quot;~0.6.7&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-cssmin&quot;: &quot;~0.6.1&quot;,</span>
+			<span class="nrm"> &quot;grunt-contrib-uglify&quot;: &quot;~0.2.2&quot;,</span>
+			<span class="rem">-    &quot;coffee-script&quot;: &quot;~1.6.3&quot;,</span>
+			<span class="nrm"> &quot;marked&quot;: &quot;~0.2.9&quot;</span>
+			<span class="nrm">},</span>
+			<span class="add">+  &quot;dependencies&quot;: {</span>
+			<span class="add">+    &quot;coffee-script&quot;: &quot;~1.6.3&quot;,</span>
+			<span class="add">+    &quot;express&quot;: &quot;~3.3.5&quot;,</span>
+			<span class="add">+    &quot;bower&quot;: &quot;~1.2.5&quot;,</span>
+			<span class="add">+    &quot;nconf&quot;: &quot;~0.6.7&quot;</span>
+			<span class="add">+  },</span>
+			<span class="nrm">&quot;engines&quot;: {</span>
+			<span class="nrm"> &quot;node&quot;: &quot;0.10.x&quot;,</span>
+			<span class="nrm"> &quot;npm&quot;: &quot;1.2.x&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/style.less b/src/client/todo/style.less</span>
+			<span class="nfo">@@ -8,11 +8,12 @@</span>
+			<span class="nrm">.remove {</span>
+			<span class="nrm">	margin-top: 2px;</span>
+			<span class="nrm">	opacity: 0;</span>
+			<span class="rem">-	transition: all 0.3s;</span>
+			<span class="add">+	transition: all 0.3s 0.2s;</span>
+		}
+			<span class="nrm">
+		.todo:hover {</span>
+			<span class="nrm">	.remove {</span>
+			<span class="nrm">		opacity: 1;</span>
+			<span class="add">+		transition: all 0.1s 0;</span>
+			<span class="nrm">	}</span>
+		}
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/install.js b/src/deploy/install.js</span>
+			<span class="nfo">@@ -3,5 +3,4 @@</span> require(&quot;bower&quot;)
+			<span class="nrm">.install()</span>
+			<span class="nrm">.on('end', function (installed) {</span>
+			<span class="nrm">	console.log(installed);</span>
+			<span class="rem">-	require(&quot;grunt&quot;).tasks(&quot;build&quot;);</span>
+			<span class="nrm">});</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/release.sh b/src/deploy/release.sh</span>
+			<span class="wrn">new file mode 100755</span>
+			<span class="nfo">@@ -0,0 +1,34 @@</span>
+			<span class="add">+#/bin/sh</span>
+			<span class="add">+</span>
+			<span class="add">+function fin(){</span>
+			<span class="add">+	echo &quot;Cleaning up&quot;</span>
+			<span class="add">+	git co develop</span>
+			<span class="add">+	git stash pop</span>
+			<span class="add">+</span><span class="reverse"><span class="hash">	</span>
+			<span class="add">+	# Fix bower</span>
+			<span class="add">+	rm -rf bower_components</span>
+			<span class="add">+	bower install</span>
+			<span class="add">+}</span>
+			<span class="add">+</span>
+			<span class="add">+git stash</span>
+			<span class="add">+git co master</span>
+			<span class="add">+git reset --hard develop</span>
+			<span class="add">+</span>
+			<span class="add">+if grunt base</span>
+			<span class="add">+then</span>
+			<span class="add">+	echo &quot;Cutting release and pushing to heroku.&quot;</span>
+			<span class="add">+	echo -n</span>
+			<span class="add">+else</span>
+			<span class="add">+	echo &quot;Cowardly not pushing with failing base build.&quot;</span>
+			<span class="add">+	fin</span>
+			<span class="add">+	exit 1</span>
+			<span class="add">+fi</span>
+			<span class="add">+</span>
+			<span class="add">+git add --force build</span>
+			<span class="add">+git add --force bower_components/angular/angular.js</span>
+			<span class="add">+git add --force bower_components/bootstrap/fonts</span>
+			<span class="add">+</span>
+			<span class="add">+git commit -m 'Release'</span>
+			<span class="add">+git push -f heroku master</span>
+			<span class="add">+</span>
+			<span class="add">+fin</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">4b587ae</span>  Added sexier animations.</h3>
+
+		<pre>
+			<span class="nrm">bower.json                    |  2 </span><span class="rem">--</span>
+			<span class="nrm">src/client/Gruntfile.coffee   |  5 </span><span class="add">+++</span><span class="rem">--</span>
+			<span class="nrm">src/client/index.jade         |  6 </span><span class="add">++++</span><span class="rem">--</span>
+			<span class="nrm">src/client/lib/mixins.less    | 13 </span><span class="add">+++++++++++++</span>
+			<span class="nrm">src/client/page.less          |  4 </span><span class="add">++</span><span class="rem">--</span>
+			<span class="nrm">src/client/todo/module.coffee | 12 </span><span class="add">++++++</span><span class="rem">------</span>
+			<span class="nrm">src/client/todo/style.less    | 39 </span><span class="add">+++++++++++++++++++++++++++++++</span><span class="rem">--------</span>
+			<span class="nrm">src/client/todo/template.jade |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">src/server/test/serves.coffee |  6 </span><span class="rem">------</span>
+			<span class="nrm">9 files changed, 60 insertions(+), 29 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/bower.json b/bower.json</span>
+			<span class="nfo">@@ -7,8 +7,6 @@</span>
+			<span class="nrm"> &quot;bower_components&quot;</span>
+			<span class="nrm">],</span>
+			<span class="nrm">&quot;dependencies&quot;: {</span>
+			<span class="rem">-    &quot;angular-mocks&quot;: &quot;~1.0.8&quot;,</span>
+			<span class="rem">-    &quot;angular&quot;: &quot;~1.0.8&quot;,</span>
+			<span class="nrm"> &quot;bootstrap&quot;: &quot;~3.0.0&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;private&quot;: true</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/Gruntfile.coffee b/src/client/Gruntfile.coffee</span>
+			<span class="nfo">@@ -35,8 +35,9 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">					]</span>
+			<span class="nrm">					singleRun: true</span>
+			<span class="nrm">					files: [</span>
+			<span class="rem">-						&quot;bower_components/angular/angular.js&quot;</span>
+			<span class="rem">-						&quot;bower_components/angular-mocks/angular-mocks.js&quot;</span>
+			<span class="add">+						&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js&quot;</span>
+			<span class="add">+						&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-animate.js&quot;</span>
+			<span class="add">+						&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-mocks.js&quot;</span>
+			<span class="nrm">						&quot;build/bundle.js&quot;</span>
+			<span class="nrm">						&quot;src/client/**/unit.coffee&quot;</span>
+			<span class="nrm">					]</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/index.jade b/src/client/index.jade</span>
+			<span class="nfo">@@ -4,11 +4,13 @@</span> html
+			<span class="nrm">		title To Do - Angular JS</span>
+			<span class="nrm">		meta(name=&quot;viewport&quot;, content=&quot;width=device-width, initial-scale=1.0&quot;)</span>
+			<span class="nrm">		link(rel=&quot;stylesheet&quot;, href=&quot;page.css&quot;, media=&quot;screen&quot;)</span>
+			<span class="rem">-		script(src='bower/angular/angular.js')</span>
+			<span class="add">+		//- script(src='bower/angular/angular.js')</span>
+			<span class="add">+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.js')</span>
+			<span class="add">+		script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-animate.js')</span>
+			<span class="nrm">		script(src='bundle.js')</span>
+			<span class="nrm">	body(ng:app='todo')</span>
+			<span class="nrm">		.container</span>
+			<span class="rem">-			.jumbotron</span>
+			<span class="add">+			.jumbotron.well</span>
+			<span class="nrm">				include todo/template</span>
+			<span class="nrm">			footer</span>
+			<span class="nrm">				:markdown</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/lib/mixins.less b/src/client/lib/mixins.less</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,13 @@</span>
+			<span class="add">+.transition (@transition) {</span>
+			<span class="add">+	-webkit-transition: @transition;</span><span class="reverse"><span class="hash">  </span>
+			<span class="add">+	-moz-transition:    @transition;</span>
+			<span class="add">+	-ms-transition:     @transition;</span><span class="reverse"><span class="hash"> </span>
+			<span class="add">+	-o-transition:      @transition;</span><span class="reverse"><span class="hash">  </span>
+			<span class="add">+}</span>
+			<span class="add">+</span>
+			<span class="add">+.rotate (@deg) {</span>
+			<span class="add">+	-webkit-transform: rotate(@deg);</span>
+			<span class="add">+	-moz-transform: 	 rotate(@deg);</span>
+			<span class="add">+	-ms-transform: 		 rotate(@deg);</span>
+			<span class="add">+	-o-transform: 		 rotate(@deg);</span>
+			<span class="add">+}</span>
+			<span class="nrm">\ No newline at end of file</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/page.less b/src/client/page.less</span>
+			<span class="nfo">@@ -1,3 +1,3 @@</span>
+			<span class="nrm">@import &quot;bootstrap.less&quot;;</span>
+			<span class="rem">-</span>
+			<span class="rem">-@import &quot;./todo/style.less&quot;;</span>
+			<span class="nrm">\ No newline at end of file</span>
+			<span class="add">+@import &quot;./lib/mixins.less&quot;;</span>
+			<span class="add">+@import &quot;./todo/style.less&quot;;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
+			<span class="nfo">@@ -1,18 +1,18 @@</span>
+			<span class="rem">-module.exports = todo = angular.module &quot;todo&quot;, []</span>
+			<span class="add">+module.exports = todo = angular.module &quot;todo&quot;, ['ngAnimate']</span>
+			<span class="nrm">
+		todo.service &quot;storage&quot;, -&gt;</span>
+			<span class="nrm">	get: -&gt; JSON.parse window.localStorage[&quot;TDD-ToDos&quot;] || '[]'</span>
+			<span class="rem">-	put: (TDs)-&gt; window.localStorage[&quot;TDD-ToDos&quot;] = JSON.stringify TDs</span>
+			<span class="add">+	put: (TDs)-&gt; window.localStorage[&quot;TDD-ToDos&quot;] = JSON.stringify TDs || []</span>
+			<span class="nrm">
+		todo.controller &quot;todo&quot;, ($scope, storage)-&gt;</span>
+			<span class="rem">-	todos = $scope.todos = storage.get()</span>
+			<span class="add">+	$scope.todos = storage.get()</span>
+			<span class="nrm">	save = (newV, oldV) -&gt;</span>
+			<span class="rem">-		storage.put todos</span>
+			<span class="add">+		storage.put $scope.todos</span>
+			<span class="nrm">	$scope.$watch 'todos', save, true</span>
+			<span class="nrm">	Todos = $scope.Todos =</span>
+			<span class="nrm">		current: &quot;&quot;</span>
+			<span class="nrm">		add: -&gt;</span>
+			<span class="rem">-			todos.push Todos.current</span>
+			<span class="add">+			$scope.todos.push Todos.current</span>
+			<span class="nrm">			Todos.current = &quot;&quot;</span>
+			<span class="nrm">		remove: (todo)-&gt;</span>
+			<span class="rem">-			todos.splice todos.indexOf(todo), 1</span>
+			<span class="add">+			$scope.todos.splice $scope.todos.indexOf(todo), 1</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/style.less b/src/client/todo/style.less</span>
+			<span class="nfo">@@ -5,15 +5,38 @@</span>
+			<span class="nrm"> width: 100%;</span>
+		}
+
+			<span class="rem">-.remove {</span>
+			<span class="rem">-	margin-top: 2px;</span>
+			<span class="rem">-	opacity: 0;</span>
+			<span class="rem">-	transition: all 0.3s 0.2s;</span>
+			<span class="rem">-}</span>
+			<span class="rem">-</span>
+			<span class="rem">-.todo:hover {</span>
+			<span class="add">+.todo {</span>
+			<span class="nrm">	.remove {</span>
+			<span class="add">+		margin-top: 2px;</span>
+			<span class="add">+		opacity: 0;</span>
+			<span class="add">+		.transition(all 0.1s ease 0s);</span>
+			<span class="add">+	}</span>
+			<span class="add">+	&amp;:hover {</span>
+			<span class="add">+		.remove {</span>
+			<span class="add">+			opacity: 1;</span>
+			<span class="add">+			.transition(all 0.3s ease 0.2s);</span>
+			<span class="add">+		}</span>
+			<span class="add">+	}</span>
+			<span class="add">+</span>
+			<span class="add">+	// Enter and exit animations</span>
+			<span class="add">+	// Smooth fade in from slight angle</span>
+			<span class="add">+	&amp;.ng-enter { .transition(all 0.5s ease); }</span>
+			<span class="add">+	&amp;.ng-leave { .transition(all 0.2s ease); }</span>
+			<span class="add">+	&amp;.ng-leave {</span>
+			<span class="add">+		.remove {</span>
+			<span class="add">+			display: none;</span>
+			<span class="add">+		}</span>
+			<span class="add">+	}</span>
+			<span class="add">+</span>
+			<span class="add">+	&amp;.ng-enter,</span>
+			<span class="add">+	&amp;.ng-leave.ng-leave-active {</span>
+			<span class="add">+		opacity: 0;</span>
+			<span class="add">+		.rotate(6deg);</span>
+			<span class="add">+	}</span>
+			<span class="add">+</span>
+			<span class="add">+	&amp;.ng-enter.ng-enter-active,</span>
+			<span class="add">+	&amp;.ng-leave {</span>
+			<span class="nrm">		opacity: 1;</span>
+			<span class="rem">-		transition: all 0.1s 0;</span>
+			<span class="add">+		.rotate(0);</span>
+			<span class="nrm">	}</span>
+		}
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/template.jade b/src/client/todo/template.jade</span>
+			<span class="nfo">@@ -8,4 +8,4 @@</span> section.row(ng:controller='todo')
+			<span class="nrm">			li.todo(ng:repeat='todo in todos')</span>
+			<span class="nrm">				| {{todo}}</span>
+			<span class="nrm">				button.remove.btn.btn-default.btn-sm.pull-right(ng:click=&quot;Todos.remove(todo)&quot;)</span>
+			<span class="rem">-					span.glyphicon.glyphicon-ok</span>
+			<span class="nrm">\ No newline at end of file</span>
+			<span class="add">+					span.glyphicon.glyphicon-ok</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/test/serves.coffee b/src/server/test/serves.coffee</span>
+			<span class="nfo">@@ -86,12 +86,6 @@</span> describe &quot;Server&quot;, -&gt;
+			<span class="nrm">			styles done, (e, res)-&gt;</span>
+			<span class="nrm">				res.headers[&quot;content-type&quot;].should.equal &quot;text/css&quot;</span>
+
+			<span class="rem">-	describe &quot;bower&quot;, -&gt;</span>
+			<span class="rem">-		it &quot;serves Bower resources&quot;, (done)-&gt;</span>
+			<span class="rem">-			request &quot;http://localhost:3000/bower/angular/angular.js&quot;, (e, res)-&gt;</span>
+			<span class="rem">-				res.statusCode.should.equal 200</span>
+			<span class="rem">-				done()</span>
+			<span class="rem">-</span>
+			<span class="nrm">	describe &quot;fonts&quot;, -&gt;</span>
+			<span class="nrm">		it &quot;serves fonts from bootstrap&quot;, (done)-&gt;</span>
+			<span class="nrm">			request &quot;http://localhost:3000/fonts/glyphicons-halflings-regular.woff&quot;, (e, res)-&gt;</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">715893a</span>  Feature tests run against heroku.</h3>
+
+		<pre>
+			<span class="nrm">src/deploy/release.sh                              |  7 </span><span class="add">+++</span>
+			<span class="nrm">src/features/Gruntfile.coffee                      | 69 </span><span class="add">++++++++++++++++++++</span><span class="rem">--</span>
+			<span class="nrm">src/features/behavior/steps/browsing.coffee        | 11 </span><span class="add">++</span><span class="rem">--</span>
+			<span class="nrm">.../behavior/support/worlds/protractor.coffee      |  2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">src/server/Gruntfile.coffee                        | 62 </span><span class="add">++</span><span class="rem">-----------------</span>
+			<span class="nrm">5 files changed, 84 insertions(+), 67 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/release.sh b/src/deploy/release.sh</span>
+			<span class="nfo">@@ -29,6 +29,13 @@</span> git add --force bower_components/angular/angular.js
+			<span class="nrm">git add --force bower_components/bootstrap/fonts</span>
+			<span class="nrm">
+		git commit -m 'Release'</span>
+			<span class="add">+</span>
+			<span class="add">+echo &quot;Files in release:&quot;</span>
+			<span class="add">+git ls-files</span>
+			<span class="add">+</span>
+			<span class="nrm">git push -f heroku master</span>
+
+			<span class="add">+# Test against heroku</span>
+			<span class="add">+SERVER=$(heroku apps:info | grep 'Web URL' | awk '{print $3}') grunt features</span>
+			<span class="add">+</span>
+			<span class="nrm">fin</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/Gruntfile.coffee b/src/features/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,9 +1,68 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="nrm">	grunt.Config =</span>
+			<span class="rem">-		mochaTest:</span>
+			<span class="rem">-			server:</span>
+			<span class="add">+		shell:</span>
+			<span class="add">+			kill:</span>
+			<span class="add">+				command: [</span>
+			<span class="add">+					&quot;ps | grep node | awk '{print $1}' | xargs -I{} kill {} &gt;/dev/null&quot;</span>
+			<span class="add">+					&quot;ps | grep java | awk '{print $1}' | xargs -I{} kill {} &gt;/dev/null&quot;</span>
+			<span class="add">+					&quot;exit 0&quot;</span>
+			<span class="add">+				].join &quot; ; &quot;</span>
+			<span class="add">+			install:</span>
+			<span class="add">+				command: &quot;[ -f ./selenium/selenium-server-standalone-2.34.0.jar ] || ./node_modules/protractor/bin/install_selenium_standalone&quot;</span>
+			<span class="add">+			serve:</span>
+			<span class="add">+				command: &quot;npm start ; exit 0&quot;</span>
+			<span class="nrm">				options:</span>
+			<span class="rem">-					reporter: 'spec'</span>
+			<span class="rem">-				src: [&quot;src/server/test/*coffee&quot;]</span>
+			<span class="add">+					async: true</span>
+			<span class="add">+					kill: true</span>
+			<span class="add">+			selenium:</span>
+			<span class="add">+				command: [</span>
+			<span class="add">+					&quot;java -jar ./selenium/selenium-server-standalone-2.34.0.jar&quot;</span>
+			<span class="add">+					&quot;-Dwebdriver.chrome.driver=./selenium/chromedriver&quot;</span>
+			<span class="add">+					&quot;&gt;/dev/null&quot;</span>
+			<span class="add">+				].join ' '</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					async: true</span>
+			<span class="add">+					kill: true</span>
+			<span class="add">+			sleep:</span>
+			<span class="add">+				command:</span>
+			<span class="add">+					&quot;sleep 1&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+		cucumberjs:</span>
+			<span class="add">+			all:</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					src: ['src/features/behavior/users/*']</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					tags: '~@broken'</span>
+			<span class="add">+					format: 'pretty'</span>
+			<span class="add">+			current:</span>
+			<span class="add">+				files:</span>
+			<span class="add">+					src: ['src/features/behavior/users/*']</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					tags: '@current'</span>
+			<span class="add">+</span>
+			<span class="add">+			options:</span>
+			<span class="add">+				steps: 'src/features/behavior/steps'</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.NpmTasks = [</span>
+			<span class="add">+		&quot;grunt-cucumber&quot;</span>
+			<span class="add">+		&quot;grunt-shell-spawn&quot;</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;features&quot;, &quot;Run all feature behaviors, except those tagged @broken.&quot;, [</span>
+			<span class="add">+		&quot;shell:install&quot;</span>
+			<span class="add">+		&quot;shell:selenium&quot;</span>
+			<span class="add">+		&quot;shell:sleep&quot;</span>
+			<span class="add">+		&quot;cucumberjs:all&quot;</span>
+			<span class="add">+		&quot;shell:selenium:kill&quot;</span>
+			<span class="add">+		&quot;shell:kill&quot;</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;feature&quot;, &quot;Runs feature behaviors tagged @current.&quot;, [</span>
+			<span class="add">+		&quot;shell:install&quot;</span>
+			<span class="add">+		&quot;shell:selenium&quot;</span>
+			<span class="add">+		&quot;shell:sleep&quot;</span>
+			<span class="add">+		&quot;cucumberjs:current&quot;</span>
+			<span class="add">+		&quot;shell:selenium:kill&quot;</span>
+			<span class="add">+		&quot;shell:kill&quot;</span>
+			<span class="add">+	]</span>
+
+			<span class="rem">-	grunt.NpmTasks.push &quot;grunt-mocha-test&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
+			<span class="nfo">@@ -1,26 +1,29 @@</span>
+			<span class="nrm">Q = require 'q'</span>
+			<span class="nrm">should = require &quot;should&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+server = process.env.SERVER || &quot;http://localhost:3000/&quot;</span>
+			<span class="add">+</span>
+			<span class="nrm">module.exports = -&gt;</span>
+			<span class="nrm">	@Given /has (?:his|her|a) browser open$/, (done)-&gt;</span>
+			<span class="nrm">		done()</span>
+			<span class="nrm"></span>
+			<span class="nrm">@Given /has entered a &quot;([^&quot;]*)&quot; item/, (value, done)-&gt;</span>
+			<span class="rem">-		@world.visit(&quot;http://localhost:3000/&quot;)</span>
+			<span class="add">+		@world.visit(server)</span>
+			<span class="nrm">		.then(=&gt;@world.fill(value, value, true))</span>
+			<span class="nrm">		.then(=&gt;done())</span>
+			<span class="nrm">		.catch(done)</span>
+			<span class="nrm"></span>
+			<span class="nrm">@Given /(?:on|goes to|visits) the (?:site|landing page)(?: directly)?/, (done)-&gt;</span>
+			<span class="rem">-		@world.visit(&quot;http://localhost:3000/&quot;)</span>
+			<span class="add">+		@world.visit(server)</span>
+			<span class="nrm">		.then(done)</span>
+			<span class="nrm"></span>
+			<span class="nrm">@When /goes to the &quot;([^&quot;]*)&quot; url/, (url, done)-&gt;</span>
+			<span class="rem">-		@world.visit(&quot;http://localhost:3000/&quot;)</span>
+			<span class="add">+		@world.visit(server)</span>
+			<span class="nrm">		.then(done)</span>
+			<span class="nrm"></span>
+			<span class="nrm">@Given /leaves the page/, (done)-&gt;</span>
+			<span class="nrm">		# @world.reload()</span>
+			<span class="rem">-		@world.visit(&quot;http://localhost:3000/&quot;)</span>
+			<span class="add">+		@world.visit(server)</span>
+			<span class="nrm">		.then -&gt;done()</span>
+			<span class="nrm"></span>
+			<span class="nrm">@When /enters &quot;([^&quot;]+)&quot; into (?:the|a) &quot;([^&quot;]+)&quot; (?:box|input|field)/, (value, field, done)-&gt;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/support/worlds/protractor.coffee b/src/features/behavior/support/worlds/protractor.coffee</span>
+			<span class="nfo">@@ -11,7 +11,7 @@</span> module.exports = class World
+			<span class="nrm">			usingServer('http://localhost:4444/wd/hub').</span>
+			<span class="nrm">			withCapabilities(webdriver.Capabilities[browser]()).build()</span>
+
+			<span class="rem">-		@driver.manage().timeouts().setScriptTimeout(1000)</span>
+			<span class="add">+		@driver.manage().timeouts().setScriptTimeout(10000)</span>
+			<span class="nrm">		@ptor = Protractor.wrapDriver(@driver)</span>
+			<span class="nrm"></span>
+			<span class="nrm">visit: (url)-&gt;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/Gruntfile.coffee b/src/server/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,61 +1,9 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="nrm">	grunt.Config =</span>
+			<span class="rem">-		shell:</span>
+			<span class="rem">-			kill:</span>
+			<span class="rem">-				command: &quot;lsof -i TCP -P | grep 4444 | awk '{print $2}' | xargs -I{} kill {} &gt;/dev/null  || exit 0&quot;</span>
+			<span class="rem">-			install:</span>
+			<span class="rem">-				command: &quot;[ -f ./selenium/selenium-server-standalone-2.34.0.jar ] || ./node_modules/protractor/bin/install_selenium_standalone&quot;</span>
+			<span class="rem">-			selenium:</span>
+			<span class="rem">-				command: [</span>
+			<span class="rem">-					&quot;java -jar ./selenium/selenium-server-standalone-2.34.0.jar&quot;</span>
+			<span class="rem">-					&quot;-Dwebdriver.chrome.driver=./selenium/chromedriver&quot;</span>
+			<span class="rem">-					&quot;&gt;/dev/null&quot;</span>
+			<span class="rem">-				].join ' '</span>
+			<span class="add">+		mochaTest:</span>
+			<span class="add">+			server:</span>
+			<span class="nrm">				options:</span>
+			<span class="rem">-					async: true</span>
+			<span class="rem">-					kill: true</span>
+			<span class="rem">-			sleep:</span>
+			<span class="rem">-				command:</span>
+			<span class="rem">-					&quot;sleep 1&quot;</span>
+			<span class="add">+					reporter: 'spec'</span>
+			<span class="add">+				src: [&quot;src/server/test/*coffee&quot;]</span>
+
+			<span class="rem">-		cucumberjs:</span>
+			<span class="rem">-			all:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					src: ['src/features/behavior/users/*']</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					tags: '~@broken'</span>
+			<span class="rem">-			current:</span>
+			<span class="rem">-				files:</span>
+			<span class="rem">-					src: ['src/features/behavior/users/*']</span>
+			<span class="rem">-				options:</span>
+			<span class="rem">-					tags: '@current'</span>
+			<span class="rem">-</span>
+			<span class="rem">-			options:</span>
+			<span class="rem">-				steps: 'src/features/behavior/steps'</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.NpmTasks = [</span>
+			<span class="rem">-		&quot;grunt-cucumber&quot;</span>
+			<span class="rem">-		&quot;grunt-shell-spawn&quot;</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.registerTask &quot;features&quot;, &quot;Run all feature behaviors, except those tagged @broken.&quot;, [</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="rem">-		&quot;shell:install&quot;</span>
+			<span class="rem">-		&quot;shell:selenium&quot;</span>
+			<span class="rem">-		&quot;shell:sleep&quot;</span>
+			<span class="rem">-		&quot;cucumberjs:all&quot;</span>
+			<span class="rem">-		&quot;shell:selenium:kill&quot;</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="rem">-	]</span>
+			<span class="rem">-</span>
+			<span class="rem">-	grunt.registerTask &quot;feature&quot;, &quot;Runs feature behaviors tagged @current.&quot;, [</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
+			<span class="rem">-		&quot;shell:install&quot;</span>
+			<span class="rem">-		&quot;shell:selenium&quot;</span>
+			<span class="rem">-		# Start the application server</span>
+			<span class="rem">-		&quot;shell:sleep&quot;</span>
+			<span class="rem">-		&quot;cucumberjs:current&quot;</span>
+			<span class="rem">-		# Stop the application server</span>
+			<span class="rem">-		&quot;shell:selenium:kill&quot;</span>
+			<span class="rem">-		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
+			<span class="rem">-	]</span>
+			<span class="add">+	grunt.NpmTasks.push &quot;grunt-mocha-test&quot;</span>
+
+		</pre>
+
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">41ed5d7</span>  Added travis config.</h3>
+
+		<pre>
+			<span class="nrm">.travis.yml        | 7 </span><span class="add">+++++++</span>
+			<span class="nrm">package.json       | 2 </span><span class="add">+</span><span class="rem">-</span>
+			<span class="nrm">src/deploy/test.js | 1 </span><span class="add">+</span>
+			<span class="nrm">3 files changed, 9 insertions(+), 1 deletion(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/.travis.yml b/.travis.yml</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,7 @@</span>
+			<span class="add">+language: node_js</span>
+			<span class="add">+node_js:</span>
+			<span class="add">+  - &quot;0.10&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+before_install:</span>
+			<span class="add">+  - &quot;export DISPLAY=:99.0&quot;</span>
+			<span class="add">+  - &quot;sh -e /etc/init.d/xvfb start&quot;</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/package.json b/package.json</span>
+			<span class="nfo">@@ -5,7 +5,7 @@</span>
+			<span class="nrm">&quot;main&quot;: &quot;index.js&quot;,</span>
+			<span class="nrm">&quot;scripts&quot;: {</span>
+			<span class="nrm"> &quot;postinstall&quot;: &quot;node src/deploy/install.js&quot;,</span>
+			<span class="rem">-    &quot;test&quot;: &quot;grunt test&quot;,</span>
+			<span class="add">+    &quot;test&quot;: &quot;node src/deploy/test.js&quot;,</span>
+			<span class="nrm"> &quot;start&quot;: &quot;node src/deploy/start.js&quot;</span>
+			<span class="nrm">},</span>
+			<span class="nrm">&quot;author&quot;: &quot;David Souther&quot;,</span>
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/src/deploy/test.js b/src/deploy/test.js</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1 @@</span>
+			<span class="add">+require(&quot;grunt&quot;).tasks(&quot;base&quot;);</span>
+
+		</pre>
+	</div>
+
+	<div class="commit">
+		<h3><span class="hash">3b228d6</span>  Added heroku deploy config.</h3>
+
+		<pre>
+			<span class="nrm">.travis.yml | 14 </span><span class="add">++++++++++</span><span class="rem">----</span>
+			<span class="nrm">1 file changed, 10 insertions(+), 4 deletions(-)</span>
+
+		</pre>
+
+
+		<pre>
+			<span class="wrn">diff --git a/.travis.yml b/.travis.yml</span>
+			<span class="nfo">@@ -1,7 +1,13 @@</span>
+			<span class="nrm">language: node_js</span>
+			<span class="nrm">node_js:</span>
+			<span class="rem">-  - &quot;0.10&quot;</span>
+			<span class="rem">-</span>
+			<span class="add">+- '0.10'</span>
+			<span class="nrm">before_install:</span>
+			<span class="rem">-  - &quot;export DISPLAY=:99.0&quot;</span>
+			<span class="rem">-  - &quot;sh -e /etc/init.d/xvfb start&quot;</span>
+			<span class="add">+- export DISPLAY=:99.0</span>
+			<span class="add">+- sh -e /etc/init.d/xvfb start</span>
+			<span class="add">+deploy:</span>
+			<span class="add">+  provider: heroku</span>
+			<span class="add">+  api_key:</span>
+			<span class="add">+    secure: cGrIXz0ZwnshOnasByfakIdtum9Sbef5RCRYaN2h/ovAzCyDty/+pOp6DOu/OvJrzyRs4EngO4scThLwwceT/bnzbBudWasvSQIkmcI8kILpJpwWFJ1Wn8oRM5x1euhrB7uBSDY3TvneAeZWPx/eJLm2fQpw5c1xonVyuzChBfc=</span>
+			<span class="add">+  app: afternoon-savannah-7174</span>
+			<span class="add">+  on:</span>
+			<span class="add">+    repo: DavidSouther/tdd-angular</span>
+
+		</pre>
+	</div>
+
+</div></div></div>
+</body>
+</html>

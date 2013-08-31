@@ -1,0 +1,168 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript" src="scripts.js"></script>
+</head>
+
+<body>
+<div class="container">
+<div class="row">
+<div class="col-md-8 col-md-offset-2">
+
+	<h1><a href="http://www.obeythetestinggoat.com/">Obey the Testing Goat</a> <small>NodeJS edition!</small></h1>
+
+
+	<div class="commit">
+		<h3><span class="hash">89ea624</span>  Added bundle.</h3>
+		<pre>
+			<span class="nrm">.gitignore                |   1 </span><span class="add">+</span>
+			<span class="nrm">Gruntfile.coffee          |  22 </span><span class="add">+++++++++</span><span class="rem">-</span>
+			<span class="nrm">client/.gitignore         |   1 </span><span class="add">+</span>
+			<span class="nrm">client/app/todo.coffee    |   4 </span><span class="add">++</span>
+			<span class="nrm">client/main.coffee        |   1 </span><span class="add">+</span>
+			<span class="nrm">package.json              |   8 </span><span class="add">+++</span><span class="rem">-</span>
+			<span class="nrm">server/server.coffee      |   8 </span><span class="add">+++</span><span class="rem">-</span>
+			<span class="nrm">server/test/serves.coffee | 100 </span><span class="add">++++++++++++++++++++++++++++</span><span class="rem">------------------</span>
+			<span class="nrm">8 files changed, 102 insertions(+), 43 deletions(-)</span>
+		</pre>
+
+		<p>I am really bad at this. This is another two commits in one. The first half is using [Browserify](https://github.com/substack/node-browserify) to build a javascript bundle during the build process. It works by taking a path to a single file, which <code>requires()</code> its dependencies. </p>
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -1,5 +1,16 @@</span>
+			<span class="nrm">module.exports = (grunt)-&gt;</span>
+			<span class="nrm">	grunt.initConfig</span>
+			<span class="add">+		browserify:</span>
+			<span class="add">+			dev:</span>
+			<span class="add">+				files: &quot;client/bundle.js&quot;: [&quot;client/main.coffee&quot;]</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					shim:</span>
+			<span class="add">+						angular:</span>
+			<span class="add">+							path: 'bower_components/angular/angular.js'</span>
+			<span class="add">+							exports: 'angular'</span>
+			<span class="add">+					transform: [</span>
+			<span class="add">+						&quot;caching-coffeeify&quot;</span>
+			<span class="add">+					]</span>
+			<span class="nrm">		mochaTest:</span>
+			<span class="nrm">			server:</span>
+			<span class="nrm">				options:</span>
+			<span class="nfo">@@ -25,14 +36,23 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm"></span>
+			<span class="nrm">grunt.npmTasks = [</span>
+			<span class="nrm">		&quot;grunt-cucumber&quot;</span>
+			<span class="add">+		&quot;grunt-browserify&quot;</span>
+			<span class="nrm">		&quot;grunt-mocha-test&quot;</span>
+			<span class="nrm">		&quot;grunt-contrib-watch&quot;</span>
+			<span class="nrm">	]</span>
+			<span class="nrm"></span>
+			<span class="nrm">grunt.loadNpmTasks npmTask for npmTask in grunt.npmTasks</span>
+			<span class="nrm"></span>
+			<span class="add">+	grunt.registerTask &quot;build&quot;, [</span>
+			<span class="add">+		&quot;browserify:dev&quot;</span>
+			<span class="add">+	]</span>
+			<span class="add">+</span>
+			<span class="nrm">	grunt.registerTask &quot;test&quot;, [</span>
+			<span class="nrm">		&quot;mochaTest:server&quot;</span>
+			<span class="nrm">		&quot;cucumberjs:Edith&quot;</span>
+			<span class="nrm">	]</span>
+			<span class="rem">-	grunt.registerTask &quot;default&quot;, [&quot;test&quot;]</span>
+			<span class="add">+</span>
+			<span class="add">+	grunt.registerTask &quot;default&quot;, [</span>
+			<span class="add">+		&quot;build&quot;</span>
+			<span class="add">+		&quot;test&quot;</span>
+			<span class="add">+	]</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/client/main.coffee b/client/main.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1 @@</span>
+			<span class="add">+todo = require &quot;./app/todo.coffee&quot;</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/client/app/todo.coffee b/client/app/todo.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,4 @@</span>
+			<span class="add">+angular =</span>
+			<span class="add">+	module: (name, deps)-&gt;</span>
+			<span class="add">+</span>
+			<span class="add">+module.exports = todo = angular.module &quot;todo&quot;, []</span>
+		</pre>
+
+		<p>The second half of the commit is configuring the server to return the compiled bundles on request.</p>
+
+		<pre>
+			<span class="wrn">diff --git a/server/test/serves.coffee b/server/test/serves.coffee</span>
+			<span class="nfo">@@ -1,46 +1,70 @@</span>
+			<span class="nrm">should = require &quot;should&quot;</span>
+			<span class="nrm">server = require &quot;../server&quot;</span>
+			<span class="nrm">request = require &quot;request&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+get = (path, d, cb)-&gt;</span>
+			<span class="add">+	request path, (e, r, b)-&gt;</span>
+			<span class="add">+		cb e, r, b</span>
+			<span class="add">+		d()</span>
+			<span class="add">+</span>
+			<span class="add">+index = (d, cb)-&gt; get &quot;http://localhost:3000/&quot;, d, cb</span>
+			<span class="add">+bundle = (d, cb)-&gt; get &quot;http://localhost:3000/bundle.js&quot;, d, cb</span>
+			<span class="add">+</span>
+			<span class="add">+Callbacks =</span>
+			<span class="add">+	OK: (e, res)-&gt;</span>
+			<span class="add">+		res.statusCode.should.equal 200</span>
+			<span class="add">+</span>
+			<span class="nrm">describe &quot;Server&quot;, -&gt;</span>
+			<span class="rem">-	index = (d, cb)-&gt;</span>
+			<span class="rem">-		request &quot;http://localhost:3000/&quot;, (e, r, b)-&gt;</span>
+			<span class="rem">-			cb e, r, b</span>
+			<span class="rem">-			d()</span>
+			<span class="nrm"></span>
+			<span class="nrm">before -&gt;</span>
+			<span class="nrm">		server.serve()</span>
+			<span class="nrm"></span>
+			<span class="com">[...]</span>
+			<span class="add">+	describe &quot;bundle.js&quot;, (done)-&gt;</span>
+			<span class="add">+		it &quot;returns a bundle&quot;, (done)-&gt;</span>
+			<span class="add">+			bundle done, Callbacks.OK</span>
+			<span class="add">+</span>
+			<span class="add">+		it &quot;returns a js bundle&quot;, (done)-&gt;</span>
+			<span class="add">+			bundle done, (e, res)-&gt;</span>
+			<span class="add">+				res.headers[&quot;content-type&quot;].should.equal &quot;text/javascript&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+		it &quot;defines an Angular module&quot;, (done)-&gt;</span>
+			<span class="add">+			bundle done, (e, r, body)-&gt;</span>
+			<span class="add">+				body.should.match ///</span>
+			<span class="add">+					angular\.module\(&quot;todo&quot;</span>
+			<span class="add">+				///</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/server/server.coffee b/server/server.coffee</span>
+			<span class="nfo">@@ -1,10 +1,14 @@</span>
+			<span class="add">+path = require &quot;path&quot;</span>
+			<span class="nrm">express = require &quot;express&quot;</span>
+			<span class="nrm">app = express()</span>
+			<span class="rem">-path = require &quot;path&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+app.get '/bundle.js', (req, res)-&gt;</span>
+			<span class="add">+	res.set &quot;content-type&quot;, &quot;text/javascript&quot;</span>
+			<span class="add">+	res.sendfile path.join __dirname, &quot;..&quot;, &quot;client&quot;, &quot;bundle.js&quot;</span>
+			<span class="nrm">
+			app.get '/', (req, res)-&gt;</span>
+			<span class="nrm">	res.sendfile path.join __dirname, &quot;..&quot;, &quot;client&quot;, &quot;index.html&quot;</span>
+			<span class="nrm">
+			module.exports =</span>
+			<span class="nrm">	serve: -&gt;</span>
+			<span class="remove">-		app.listen(3000)</span>
+			<span class="add">+		app.listen(3000)</span>
+		</pre>
+	</div>
+
+</div>
+</div>
+</div>
+</body>
+</html>

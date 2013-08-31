@@ -1,0 +1,39 @@
+.add {
+	color: #63e463;
+}
+
+.rem {
+	color: #e12;
+}
+
+.wrn {
+	color: #f9fe64;
+}
+
+.nfo {
+	color: #a0a;
+}
+
+.com {
+	color: #ccc;
+}
+
+.hash {
+	color: #800;
+}
+
+pre {
+	padding: 19px;
+	margin-bottom: 20px;
+	color: white;
+	background-color: #333;
+
+	border: 1px solid #e3e3e3;
+	border-radius: 4px;
+
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	-ie-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	-o-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}

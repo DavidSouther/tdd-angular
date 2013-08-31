@@ -7,12 +7,13 @@
 </head>
 
 <body>
-<div class="container">
-<div class="row">
-<div class="col-md-8 col-md-offset-2">
+<div class="container"><div class="row"><div class="col-md-8 col-md-offset-2">
 
 	<h1><a href="http://www.obeythetestinggoat.com/">Obey the Testing Goat</a> <small>NodeJS edition!</small></h1>
 
+	<h2>The first actual features</h2>
+
+	<p class="lead">In the second part of this walkthrough, we implement the first features of the todo app. </p>
 
 	<div class="commit">
 		<h3><span class="hash">89ea624</span>  Added bundle.</h3>
@@ -28,7 +29,7 @@
 			<span class="nrm">8 files changed, 102 insertions(+), 43 deletions(-)</span>
 		</pre>
 
-		<p>I am really bad at this. This is another two commits in one. The first half is using [Browserify](https://github.com/substack/node-browserify) to build a javascript bundle during the build process. It works by taking a path to a single file, which <code>requires()</code> its dependencies. </p>
+		<p>I am really bad at this. This is another two commits in one. The first half is using <a href="https://github.com/substack/node-browserify">Browserify</a> to build a javascript bundle during the build process. It works by taking a path to a single file, which <code>requires()</code> its dependencies. The second part is extending the server to return the compiled bundle on request.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
@@ -150,19 +151,103 @@
 			<span class="add">+app.get '/bundle.js', (req, res)-&gt;</span>
 			<span class="add">+	res.set &quot;content-type&quot;, &quot;text/javascript&quot;</span>
 			<span class="add">+	res.sendfile path.join __dirname, &quot;..&quot;, &quot;client&quot;, &quot;bundle.js&quot;</span>
-			<span class="nrm">
-			app.get '/', (req, res)-&gt;</span>
+			<span class="nrm"></span>
+			<span class="nrm">app.get '/', (req, res)-&gt;</span>
 			<span class="nrm">	res.sendfile path.join __dirname, &quot;..&quot;, &quot;client&quot;, &quot;index.html&quot;</span>
-			<span class="nrm">
-			module.exports =</span>
-			<span class="nrm">	serve: -&gt;</span>
-			<span class="remove">-		app.listen(3000)</span>
-			<span class="add">+		app.listen(3000)</span>
 		</pre>
 	</div>
 
-</div>
-</div>
-</div>
+
+	<div class="commit">
+		<h3><span class="hash">ae98607</span>  Basic Karma test.</h3>
+		<pre>
+			<span class="nrm">Gruntfile.coffee       | 21 </span><span class="add">+++++++++++++++++</span><span class="rem">----</span>
+			<span class="nrm">client/app/test.coffee | 10 </span><span class="add">++++++++++</span>
+			<span class="nrm">client/app/todo.coffee |  7 </span><span class="add">++++</span><span class="rem">---</span>
+			<span class="nrm">package.json           |  4 </span><span class="add">+++</span><span class="rem">-</span>
+			<span class="nrm">4 files changed, 34 insertions(+), 8 deletions(-)</span>
+		</pre>
+
+		<p>An Angular test, and Angular code! In grunt, we switch from compiling Angular into the bundle to including Angular from CDN on its own (in this case, "CDN" is our bower install directory). The test is in Karma, and runs in the browser. That said, these are Angular unit tests, working each piece of the module in isolation. This first commit is just enough code to show that Karma runs reasonably.</p>
+
+		<pre>
+			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
+			<span class="nfo">@@ -4,13 +4,24 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm">			dev:</span>
+			<span class="nrm">				files: &quot;client/bundle.js&quot;: [&quot;client/main.coffee&quot;]</span>
+			<span class="nrm">				options:</span>
+			<span class="rem">-					shim:</span>
+			<span class="rem">-						angular:</span>
+			<span class="rem">-							path: 'bower_components/angular/angular.js'</span>
+			<span class="rem">-							exports: 'angular'</span>
+			<span class="add">+					debug: true</span>
+			<span class="nrm">					transform: [</span>
+			<span class="nrm">						&quot;caching-coffeeify&quot;</span>
+			<span class="nrm">					]</span>
+			<span class="add">+</span>
+			<span class="add">+		karma:</span>
+			<span class="add">+			unit:</span>
+			<span class="add">+				options:</span>
+			<span class="add">+					browsers: [&quot;PhantomJS&quot;]</span>
+			<span class="add">+					frameworks: [&quot;jasmine&quot;]</span>
+			<span class="add">+					singleRun: true</span>
+			<span class="add">+					files: [</span>
+			<span class="add">+							&quot;bower_components/angular/angular.js&quot;</span>
+			<span class="add">+							&quot;bower_components/angular-mocks/angular-mocks.js&quot;</span>
+			<span class="add">+							&quot;client/bundle.js&quot;</span>
+			<span class="add">+							&quot;client/app/**/test.coffee&quot;</span>
+			<span class="add">+						]</span>
+			<span class="add">+</span>
+			<span class="nrm">		mochaTest:</span>
+			<span class="nrm">			server:</span>
+			<span class="nrm">				options:</span>
+			<span class="nfo">@@ -36,6 +47,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm"></span>
+			<span class="nrm">grunt.npmTasks = [</span>
+			<span class="nrm">		&quot;grunt-cucumber&quot;</span>
+			<span class="add">+		&quot;grunt-karma&quot;</span>
+			<span class="nrm">		&quot;grunt-browserify&quot;</span>
+			<span class="nrm">		&quot;grunt-mocha-test&quot;</span>
+			<span class="nrm">		&quot;grunt-contrib-watch&quot;</span>
+			<span class="nfo">@@ -49,6 +61,7 @@</span> module.exports = (grunt)-&gt;
+			<span class="nrm"></span>
+			<span class="nrm">grunt.registerTask &quot;test&quot;, [</span>
+			<span class="nrm">		&quot;mochaTest:server&quot;</span>
+			<span class="add">+		&quot;karma:unit&quot;</span>
+			<span class="nrm">		&quot;cucumberjs:Edith&quot;</span>
+			<span class="nrm">	]</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/client/app/test.coffee b/client/app/test.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,10 @@</span>
+			<span class="add">+describe &quot;todo bootstrap&quot;, -&gt;</span>
+			<span class="add">+	beforeEach module &quot;todo&quot;</span>
+			<span class="add">+</span>
+			<span class="add">+	$scope = null</span>
+			<span class="add">+	beforeEach inject ($rootScope, $controller)-&gt;</span>
+			<span class="add">+		$scope = $rootScope.$new()</span>
+			<span class="add">+		$controller &quot;todo&quot;, {$scope}</span>
+			<span class="add">+</span>
+			<span class="add">+	it &quot;exposes todo lists&quot;, -&gt;</span>
+			<span class="add">+		expect($scope.todos).toEqual([])</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/client/app/todo.coffee b/client/app/todo.coffee</span>
+			<span class="nfo">@@ -1,4 +1,5 @@</span>
+			<span class="rem">-angular =</span>
+			<span class="rem">-	module: (name, deps)-&gt;</span>
+			<span class="rem">-</span>
+			<span class="nrm">module.exports = todo = angular.module &quot;todo&quot;, []</span>
+			<span class="add">+</span>
+			<span class="add">+angular.module(&quot;todo&quot;)</span>
+			<span class="add">+.controller &quot;todo&quot;, ($scope)-&gt;</span>
+			<span class="add">+	$scope.todos = []</span>
+		</pre>
+	</div>
+
+</div></div></div>
 </body>
 </html>

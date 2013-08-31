@@ -52,3 +52,12 @@ pre {
 
 	padding: 1px 9px 0;
 }
+
+.commit h3 {
+	cursor: pointer;
+}
+
+.commit.minify p,
+.commit.minify pre {
+	display: none;
+}

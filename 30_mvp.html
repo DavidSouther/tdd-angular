@@ -50,50 +50,6 @@
 	</div>
 
 	<div class="commit">
-		<h3><span class="hash">6a9644c</span>  Finished defining tasks.</h3>
-
-		<pre>
-			<span class="nrm">src/features/behavior/steps/browsing.coffee | 15 </span><span class="add">+++++++++++++</span><span class="rem">--</span>
-			<span class="nrm">1 file changed, 13 insertions(+), 2 deletions(-)</span>
-
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
-			<span class="nfo">@@ -14,14 +14,25 @@</span> module.exports = -&gt;
-			<span class="nrm">	@Given /has (?:his|her|a) browser open$/, (done)-&gt;</span>
-			<span class="nrm">		done()</span>
-
-			<span class="rem">-	@Given /on the landing page/, (done)-&gt;</span>
-			<span class="add">+	@Given /has entered a &quot;([^&quot;]*)&quot; item/, (value, done)-&gt;</span>
-			<span class="add">+		@world.visit(&quot;http://localhost:3000/&quot;)</span>
-			<span class="add">+		.then(=&gt;@world.fill(value, value, true))</span>
-			<span class="add">+		.then(=&gt;done())</span>
-			<span class="add">+		.catch(done)</span>
-			<span class="add">+</span>
-			<span class="add">+	@Given /(?:on|goes to) the (?:site|landing page)(?: directly)?/, (done)-&gt;</span>
-			<span class="nrm">		@world.visit(&quot;http://localhost:3000/&quot;)</span>
-			<span class="nrm">		.then(done)</span>
-
-			<span class="rem">-	@When /goes to the (?:site|landing page)(?: directly)?/, (done) -&gt;</span>
-			<span class="add">+	@When /goes to the &quot;([^&quot;]*)&quot; url/, (url, done)-&gt;</span>
-			<span class="nrm">		@world.visit(&quot;http://localhost:3000/&quot;)</span>
-			<span class="nrm">		.then(done)</span>
-
-			<span class="add">+	@Given /leaves the page/, (done)-&gt;</span>
-			<span class="add">+		# @world.reload()</span>
-			<span class="add">+		@world.visit(&quot;http://localhost:3000/&quot;)</span>
-			<span class="add">+		.then -&gt;done()</span>
-			<span class="add">+</span>
-			<span class="nrm">	@When /enters &quot;([^&quot;]+)&quot; into (?:the|a) &quot;([^&quot;]+)&quot; (?:box|input|field)/, (value, field, done)-&gt;</span>
-			<span class="nrm">		@world.fill(field, value, true)</span>
-			<span class="nrm">		.then(-&gt;done())</span>
-
-		</pre>
-	</div>
-
-	<div class="commit">
 		<h3><span class="hash">b251505</span>  Implemented auto local save.</h3>
 
 		<pre>
@@ -103,28 +59,7 @@
 
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
-			<span class="nfo">@@ -1,9 +1,14 @@</span>
-			<span class="nrm">module.exports = todo = angular.module &quot;todo&quot;, []</span>
-
-			<span class="rem">-todo.controller &quot;todo&quot;, ($scope)-&gt;</span>
-			<span class="rem">-	$scope.todos = []</span>
-			<span class="add">+todo.service &quot;storage&quot;, -&gt;</span>
-			<span class="add">+	get: -&gt; JSON.parse window.localStorage[&quot;TDD-ToDos&quot;] || '[]'</span>
-			<span class="add">+	set: (TDs)-&gt; window.localStorage[&quot;TDD-ToDos&quot;] = JSON.stringify TDs</span>
-			<span class="add">+</span>
-			<span class="add">+todo.controller &quot;todo&quot;, ($scope, storage)-&gt;</span>
-			<span class="add">+	$scope.todos = storage.get()</span>
-			<span class="nrm">	Todos = $scope.Todos =</span>
-			<span class="nrm">		current: &quot;&quot;</span>
-			<span class="nrm">		add: -&gt;</span>
-			<span class="nrm">			$scope.todos.push Todos.current</span>
-			<span class="nrm">			Todos.current = &quot;&quot;</span>
-			<span class="add">+			storage.set $scope.todos</span>
-		</pre>
-
+		<p>After finishing implementing tests for checking if the user's data was saved, it's time to implement said save functionality. We use html5 localstorage here. Remember that localstorage is string:string key/value pairs only, so it's the client's responsibilty to handle serialization.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/unit.coffee b/src/client/todo/unit.coffee</span>
@@ -166,7 +101,27 @@
 			<span class="add">+</span>
 			<span class="add">+			it &quot;restores from local storage&quot;, -&gt;</span>
 			<span class="add">+				expect($scope.todos).toEqual([&quot;Todo 1&quot;], &quot;Loaded one saved todo&quot;)</span>
+		</pre>
 
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
+			<span class="nfo">@@ -1,9 +1,14 @@</span>
+			<span class="nrm">module.exports = todo = angular.module &quot;todo&quot;, []</span>
+
+			<span class="rem">-todo.controller &quot;todo&quot;, ($scope)-&gt;</span>
+			<span class="rem">-	$scope.todos = []</span>
+			<span class="add">+todo.service &quot;storage&quot;, -&gt;</span>
+			<span class="add">+	get: -&gt; JSON.parse window.localStorage[&quot;TDD-ToDos&quot;] || '[]'</span>
+			<span class="add">+	set: (TDs)-&gt; window.localStorage[&quot;TDD-ToDos&quot;] = JSON.stringify TDs</span>
+			<span class="add">+</span>
+			<span class="add">+todo.controller &quot;todo&quot;, ($scope, storage)-&gt;</span>
+			<span class="add">+	$scope.todos = storage.get()</span>
+			<span class="nrm">	Todos = $scope.Todos =</span>
+			<span class="nrm">		current: &quot;&quot;</span>
+			<span class="nrm">		add: -&gt;</span>
+			<span class="nrm">			$scope.todos.push Todos.current</span>
+			<span class="nrm">			Todos.current = &quot;&quot;</span>
+			<span class="add">+			storage.set $scope.todos</span>
 		</pre>
 	</div>
 
@@ -183,103 +138,9 @@
 			<span class="nrm">src/server/server.coffee      |  2 </span><span class="add">+</span><span class="rem">-</span>
 			<span class="nrm">src/server/test/serves.coffee |  2 </span><span class="add">+</span><span class="rem">-</span>
 			<span class="nrm">8 files changed, 26 insertions(+), 24 deletions(-)</span>
-
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/.gitignore b/.gitignore</span>
-			<span class="nfo">@@ -2,3 +2,4 @@</span> node_modules
-			<span class="nrm">bower_components</span>
-			<span class="nrm">selenium*</span>
-			<span class="nrm">coverage</span>
-			<span class="add">+build</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
-			<span class="nfo">@@ -9,6 +9,11 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm">						&quot;caching-coffeeify&quot;</span>
-			<span class="nrm">					]</span>
-
-			<span class="add">+		jade:</span>
-			<span class="add">+			index:</span>
-			<span class="add">+				files:</span>
-			<span class="add">+					&quot;build/index.html&quot;: &quot;src/client/index.jade&quot;</span>
-			<span class="add">+</span>
-			<span class="nrm">		karma:</span>
-			<span class="nrm">			unit:</span>
-			<span class="nrm">				options:</span>
-			<span class="nfo">@@ -78,6 +83,7 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm">		&quot;grunt-shell-spawn&quot;</span>
-			<span class="nrm">		&quot;grunt-browserify&quot;</span>
-			<span class="nrm">		&quot;grunt-mocha-test&quot;</span>
-			<span class="add">+		&quot;grunt-contrib-jade&quot;</span>
-			<span class="nrm">		&quot;grunt-contrib-watch&quot;</span>
-			<span class="nrm">	]</span>
-
-			<span class="nfo">@@ -85,6 +91,7 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm"></span>
-			<span class="nrm">grunt.registerTask &quot;build&quot;, [</span>
-			<span class="nrm">		&quot;browserify:dev&quot;</span>
-			<span class="add">+		&quot;jade:index&quot;</span>
-			<span class="nrm">	]</span>
-			<span class="nrm"></span>
-			<span class="nrm">grunt.registerTask &quot;features&quot;, [</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/package.json b/package.json</span>
-			<span class="nfo">@@ -25,7 +25,8 @@</span>
-			<span class="nrm"> &quot;should&quot;: &quot;~1.2.2&quot;,</span>
-			<span class="nrm"> &quot;grunt-karma&quot;: &quot;~0.6.2&quot;,</span>
-			<span class="nrm"> &quot;phantomjs&quot;: &quot;~1.9.1-8&quot;,</span>
-			<span class="rem">-    &quot;karma-coverage&quot;: &quot;~0.1.0&quot;</span>
-			<span class="add">+    &quot;karma-coverage&quot;: &quot;~0.1.0&quot;,</span>
-			<span class="add">+    &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;</span>
-			<span class="nrm">},</span>
-			<span class="nrm">&quot;dependencies&quot;: {</span>
-			<span class="nrm"> &quot;express&quot;: &quot;~3.3.5&quot;</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/client/.gitignore b/src/client/.gitignore</span>
-			<span class="wrn">deleted file mode 100644</span>
-			<span class="nfo">@@ -1 +0,0 @@</span>
-			<span class="rem">-bundle.js</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/client/index.html b/src/client/index.html</span>
-			<span class="wrn">deleted file mode 100644</span>
-			<span class="nfo">@@ -1,20 +0,0 @@</span>
-			<span class="rem">-&lt;html&gt;</span>
-			<span class="rem">-&lt;head&gt;</span>
-			<span class="rem">-	&lt;title&gt;To Do - Angular JS&lt;/title&gt;</span>
-			<span class="rem">-	&lt;script src=&quot;bower/angular/angular.js&quot;&gt;&lt;/script&gt;</span>
-			<span class="rem">-	&lt;script src=&quot;bundle.js&quot;&gt;&lt;/script&gt;</span>
-			<span class="rem">-&lt;/head&gt;</span>
-			<span class="rem">-&lt;body ng:app=&quot;todo&quot;&gt;</span>
-			<span class="rem">-	&lt;header&gt;</span>
-			<span class="rem">-		&lt;h1&gt;To Do&lt;/h1&gt;</span>
-			<span class="rem">-	&lt;/header&gt;</span>
-			<span class="rem">-	&lt;section ng:controller=&quot;todo&quot;&gt;</span>
-			<span class="rem">-		&lt;form ng:submit=&quot;Todos.add()&quot;&gt;</span>
-			<span class="rem">-			&lt;input type=&quot;text&quot; name=&quot;to-do&quot; placeholder=&quot;to-do&quot; ng:model=&quot;Todos.current&quot; /&gt;</span>
-			<span class="rem">-		&lt;/form&gt;</span>
-			<span class="rem">-		&lt;ol ng:cloak&gt;</span>
-			<span class="rem">-			&lt;li ng:repeat=&quot;todo in todos&quot;&gt;{{todo}}&lt;/li&gt;</span>
-			<span class="rem">-		&lt;/ol&gt;</span>
-			<span class="rem">-	&lt;/section&gt;</span>
-			<span class="rem">-&lt;/body&gt;</span>
-			<span class="rem">-&lt;/html&gt;</span>
-			<span class="nrm">\ No newline at end of file</span>
-		</pre>
-
+		<p>You may have noticed I like transpiled languages. If you didn't, let me tell you, I like transpiled languages. HTML is a pain in the ass to write, so markdown takes out all the pain of formatting text/plain. It's not quite enough for representing DOM. Jade fills the gap beautifully. It's clean, elegant, and a pleasure to use. If you've been on board with me for Coffee and Markdown, you will enjoy Jade.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/index.jade b/src/client/index.jade</span>
@@ -301,32 +162,17 @@
 			<span class="add">+				li(ng:repeat='todo in todos') {{todo}}</span>
 		</pre>
 
-
 		<pre>
-			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
-			<span class="nfo">@@ -13,7 +13,7 @@</span> app.get '/bower/:module/:file', (req, res)-&gt;
-			<span class="nrm">	res.sendfile path.join root, &quot;bower_components&quot;, req.params.module, req.params.file</span>
-			<span class="nrm">
-		app.get '/', (req, res)-&gt;</span>
-			<span class="rem">-	res.sendfile path.join __dirname, &quot;..&quot;, &quot;client&quot;, &quot;index.html&quot;</span>
-			<span class="add">+	res.sendfile path.join root, &quot;build&quot;, &quot;index.html&quot;</span>
-			<span class="nrm">
-		module.exports =</span>
-			<span class="nrm">	serve: -&gt;</span>
-		</pre>
-
-
-		<pre>
-				<span class="wrn">diff --git a/src/server/test/serves.coffee b/src/server/test/serves.coffee</span>
-				<span class="nfo">@@ -29,7 +29,7 @@</span> describe &quot;Server&quot;, -&gt;
-				<span class="nrm"></span>
-				<span class="nrm">	it &quot;returns an index page at /&quot;, (done)-&gt;</span>
-				<span class="nrm">			index done, (e, r, body)-&gt;</span>
-				<span class="rem">-				body.should.match /^&lt;html&gt;/</span>
-				<span class="add">+				body.should.match /^&lt;!DOCTYPE html&gt;&lt;html&gt;/</span>
-				<span class="nrm">				body.should.match /&lt;\/html&gt;$/</span>
-				<span class="nrm"></span>
-				<span class="nrm">describe &quot;index.html&quot;, -&gt;</span>
+			<span class="wrn">diff --git a/src/server/test/serves.coffee b/src/server/test/serves.coffee</span>
+			<span class="nfo">@@ -29,7 +29,7 @@</span> describe &quot;Server&quot;, -&gt;
+			<span class="nrm"></span>
+			<span class="nrm">	it &quot;returns an index page at /&quot;, (done)-&gt;</span>
+			<span class="nrm">			index done, (e, r, body)-&gt;</span>
+			<span class="rem">-				body.should.match /^&lt;html&gt;/</span>
+			<span class="add">+				body.should.match /^&lt;!DOCTYPE html&gt;&lt;html&gt;/</span>
+			<span class="nrm">				body.should.match /&lt;\/html&gt;$/</span>
+			<span class="nrm"></span>
+			<span class="nrm">describe &quot;index.html&quot;, -&gt;</span>
 		</pre>
 	</div>
 
@@ -336,9 +182,9 @@
 		<pre>
 			<span class="nrm">src/features/behavior/users/jason/Jason.feature | 11 </span><span class="add">+++++++++++</span>
 			<span class="nrm">1 file changed, 11 insertions(+)</span>
-
 		</pre>
 
+		<p>Testing the stylistics of user interfaces is hard, and exploring that type of testing is somewhat uncharted territory. In this first attempt, we only check that a couple elements are somewhere relatively close to the center of the page. This topic will get revisited in the future.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/features/behavior/users/jason/Jason.feature b/src/features/behavior/users/jason/Jason.feature</span>
@@ -355,7 +201,6 @@
 			<span class="add">+		When he visits the site</span>
 			<span class="add">+		Then the &quot;header&quot; is centered</span>
 			<span class="add">+		And the &quot;input&quot; is centered</span>
-
 		</pre>
 	</div>
 
@@ -371,7 +216,6 @@
 
 		</pre>
 
-
 		<pre>
 			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
 			<span class="nfo">@@ -4,7 +4,7 @@</span> World = require &quot;../support/worlds&quot;
@@ -386,12 +230,11 @@
 			<span class="nfo">@@ -20,7 +20,7 @@</span> module.exports = -&gt;
 			<span class="nrm">		.then(=&gt;done())</span>
 			<span class="nrm">		.catch(done)</span>
-
+			<span class="nrm"></span>
 			<span class="rem">-	@Given /(?:on|goes to) the (?:site|landing page)(?: directly)?/, (done)-&gt;</span>
 			<span class="add">+	@Given /(?:on|goes to|visits) the (?:site|landing page)(?: directly)?/, (done)-&gt;</span>
 			<span class="nrm">		@world.visit(&quot;http://localhost:3000/&quot;)</span>
 			<span class="nrm">		.then(done)</span>
-
 		</pre>
 
 
@@ -431,22 +274,6 @@
 			<span class="add">+</span>
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/support/worlds.coffee b/src/features/behavior/support/worlds.coffee</span>
-			<span class="nfo">@@ -1,2 +1,8 @@</span>
-			<span class="rem">-module.exports = require &quot;./worlds/protractor&quot;</span>
-			<span class="add">+World = require &quot;./worlds/protractor&quot;</span>
-			<span class="nrm"># module.exports = require &quot;./worlds/zombie&quot;</span>
-			<span class="add">+world = new World()</span>
-			<span class="add">+module.exports =</span>
-			<span class="add">+	get: -&gt;</span>
-			<span class="add">+		if world.isDestroyed()</span>
-			<span class="add">+			world = new World()</span>
-			<span class="add">+		return world</span>
-		</pre>
-
-
 		<pre>
 			<span class="wrn">diff --git a/src/features/behavior/support/worlds/protractor.coffee b/src/features/behavior/support/worlds/protractor.coffee</span>
 			<span class="nfo">@@ -4,6 +4,7 @@</span> webdriver = require &quot;selenium-webdriver&quot;
@@ -478,7 +305,6 @@
 			<span class="nrm">		@driver.quit()</span>
 			<span class="add">+</span>
 			<span class="add">+	isDestroyed: -&gt; _destroyed</span>
-
 		</pre>
 	</div>
 
@@ -494,16 +320,16 @@
 			<span class="nrm">src/server/server.coffee      |  4 </span><span class="add">++++</span>
 			<span class="nrm">src/server/test/serves.coffee | 15 </span><span class="add">++++++++++++++</span><span class="rem">-</span>
 			<span class="nrm">7 files changed, 87 insertions(+), 15 deletions(-)</span>
-
 		</pre>
 
+		<p>Bootstrap is the new jQuery UI. It's certainly cleaner and more modern than jquery ui, and works great for projects like this. After the rave for Jade a couple commits ago, using a CSS transpiler is unsurprising. I personally prefer the syntax of Stylus, but alas, Bootstrap is Less, and if I wanted to configure it (which I will in future projects), less is more.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/Gruntfile.coffee b/Gruntfile.coffee</span>
 			<span class="nfo">@@ -14,6 +14,15 @@</span> module.exports = (grunt)-&gt;
 			<span class="nrm">				files:</span>
 			<span class="nrm">					&quot;build/index.html&quot;: &quot;src/client/index.jade&quot;</span>
-
+			<span class="nrm"></span>
 			<span class="add">+		less:</span>
 			<span class="add">+			page:</span>
 			<span class="add">+				options:</span>
@@ -535,13 +361,6 @@
 			<span class="nrm">				steps: 'src/features/behavior/steps'</span>
 			<span class="nrm"></span>
 			<span class="nrm">	watch:</span>
-			<span class="add">+			build:</span>
-			<span class="add">+				files:[</span>
-			<span class="add">+					'src/client/**/*jade'</span>
-			<span class="add">+					'src/client/**/*coffee'</span>
-			<span class="add">+					'src/client/**/*less'</span>
-			<span class="add">+				]</span>
-			<span class="add">+				tasks: ['build']</span>
 			<span class="nrm">			all:</span>
 			<span class="nrm">				files: [</span>
 			<span class="nrm">					'src/features/**/*coffee'</span>
@@ -552,84 +371,7 @@
 			<span class="nrm">					'src/client/**/*coffee'</span>
 			<span class="nrm">					'src/client/**/*less'</span>
 			<span class="nrm">				]</span>
-			<span class="nfo">@@ -84,6 +107,7 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm">		&quot;grunt-browserify&quot;</span>
-			<span class="nrm">		&quot;grunt-mocha-test&quot;</span>
-			<span class="nrm">		&quot;grunt-contrib-jade&quot;</span>
-			<span class="add">+		&quot;grunt-contrib-less&quot;</span>
-			<span class="nrm">		&quot;grunt-contrib-watch&quot;</span>
-			<span class="nrm">	]</span>
-
-			<span class="nfo">@@ -92,6 +116,7 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm">	grunt.registerTask &quot;build&quot;, [</span>
-			<span class="nrm">		&quot;browserify:dev&quot;</span>
-			<span class="nrm">		&quot;jade:index&quot;</span>
-			<span class="add">+		&quot;less:page&quot;</span>
-			<span class="nrm">	]</span>
-			<span class="nrm"></span>
-			<span class="nrm">grunt.registerTask &quot;features&quot;, [</span>
-			<span class="nfo">@@ -99,7 +124,17 @@</span> module.exports = (grunt)-&gt;
-			<span class="nrm">		&quot;shell:install&quot;</span>
-			<span class="nrm">		&quot;shell:selenium&quot;</span>
-			<span class="nrm">		&quot;shell:sleep&quot;</span>
-			<span class="rem">-		&quot;cucumberjs:users&quot;</span>
-			<span class="add">+		&quot;cucumberjs:all&quot;</span>
-			<span class="add">+		&quot;shell:selenium:kill&quot;</span>
-			<span class="add">+		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
-			<span class="add">+	]</span>
-			<span class="add">+</span>
-			<span class="add">+	grunt.registerTask &quot;feature&quot;, [</span>
-			<span class="add">+		&quot;shell:kill&quot; # Clean up any old selenium servers, or other programs who may be hogging 4444</span>
-			<span class="add">+		&quot;shell:install&quot;</span>
-			<span class="add">+		&quot;shell:selenium&quot;</span>
-			<span class="add">+		&quot;shell:sleep&quot;</span>
-			<span class="add">+		&quot;cucumberjs:current&quot;</span>
-			<span class="nrm">		&quot;shell:selenium:kill&quot;</span>
-			<span class="nrm">		&quot;shell:kill&quot; # Also has the effect of killing driven browsers.</span>
-			<span class="nrm">	]</span>
 		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/bower.json b/bower.json</span>
-			<span class="nfo">@@ -1,4 +1,6 @@</span>
-		{
-			<span class="add">+  &quot;name&quot;: &quot;tdd-angular&quot;,</span>
-			<span class="add">+  &quot;version&quot;: &quot;0.0.0&quot;,</span>
-			<span class="nrm">&quot;ignore&quot;: [</span>
-			<span class="nrm"> &quot;**/.*&quot;,</span>
-			<span class="nrm"> &quot;node_modules&quot;,</span>
-			<span class="nfo">@@ -6,7 +8,11 @@</span>
-			<span class="nrm">],</span>
-			<span class="nrm">&quot;dependencies&quot;: {</span>
-			<span class="nrm"> &quot;angular-mocks&quot;: &quot;~1.0.8&quot;,</span>
-			<span class="rem">-    &quot;angular&quot;: &quot;~1.0.8&quot;</span>
-			<span class="add">+    &quot;angular&quot;: &quot;~1.0.8&quot;,</span>
-			<span class="add">+    &quot;bootstrap&quot;: &quot;~3.0.0&quot;</span>
-			<span class="nrm">},</span>
-			<span class="rem">-  &quot;private&quot;: true</span>
-			<span class="add">+  &quot;private&quot;: true,</span>
-			<span class="add">+  &quot;devDependencies&quot;: {</span>
-			<span class="add">+    &quot;bootstrap&quot;: &quot;~3.0.0&quot;</span>
-			<span class="add">+  }</span>
-		}
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/package.json b/package.json</span>
-			<span class="nfo">@@ -26,7 +26,8 @@</span>
-			<span class="nrm"> &quot;grunt-karma&quot;: &quot;~0.6.2&quot;,</span>
-			<span class="nrm"> &quot;phantomjs&quot;: &quot;~1.9.1-8&quot;,</span>
-			<span class="nrm"> &quot;karma-coverage&quot;: &quot;~0.1.0&quot;,</span>
-			<span class="rem">-    &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;</span>
-			<span class="add">+    &quot;grunt-contrib-jade&quot;: &quot;~0.8.0&quot;,</span>
-			<span class="add">+    &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;</span>
-			<span class="nrm">},</span>
-			<span class="nrm">&quot;dependencies&quot;: {</span>
-			<span class="nrm"> &quot;express&quot;: &quot;~3.3.5&quot;</span>
-		</pre>
-
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/index.jade b/src/client/index.jade</span>
@@ -692,7 +434,6 @@
 			<span class="nrm">	res.sendfile path.join root, &quot;build&quot;, &quot;bundle.js&quot;</span>
 		</pre>
 
-
 		<pre>
 			<span class="wrn">diff --git a/src/server/test/serves.coffee b/src/server/test/serves.coffee</span>
 			<span class="nfo">@@ -7,8 +7,9 @@</span> get = (path, d, cb)-&gt;
@@ -732,60 +473,9 @@
 			<span class="nrm">	describe &quot;bower&quot;, -&gt;</span>
 			<span class="nrm">		it &quot;serves Bower resources&quot;, (done)-&gt;</span>
 			<span class="nrm">			request &quot;http://localhost:3000/bower/angular/angular.js&quot;, (e, res)-&gt;</span>
-
 		</pre>
 
-	</div>
-
-	<div class="commit">
-		<h3><span class="hash">a479a0d</span>  Moved world management to own step definitions.</h3>
-
-		<pre>
-			<span class="nrm">src/features/behavior/steps/browsing.coffee | 10 </span><span class="rem">----------</span>
-			<span class="nrm">src/features/behavior/steps/world.coffee    | 10 </span><span class="add">++++++++++</span>
-			<span class="nrm">2 files changed, 10 insertions(+), 10 deletions(-)</span>
-
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
-			<span class="nfo">@@ -1,16 +1,6 @@</span>
-			<span class="nrm">Q = require 'q'</span>
-			<span class="nrm">should = require &quot;should&quot;</span>
-			<span class="rem">-World = require &quot;../support/worlds&quot;</span>
-			<span class="nrm">module.exports = -&gt;</span>
-			<span class="rem">-	@Before (done)-&gt;</span>
-			<span class="rem">-		# opening a browser is like entering a whole new world...</span>
-			<span class="rem">-		@world = World.get()</span>
-			<span class="rem">-		done()</span>
-			<span class="rem">-</span>
-			<span class="rem">-	@After (done)-&gt;</span>
-			<span class="rem">-		@world?.destroy()</span>
-			<span class="rem">-		done()</span>
-			<span class="rem">-</span>
-			<span class="nrm">	@Given /has (?:his|her|a) browser open$/, (done)-&gt;</span>
-			<span class="nrm">		done()</span>
-
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/world.coffee b/src/features/behavior/steps/world.coffee</span>
-			<span class="wrn">new file mode 100644</span>
-			<span class="nfo">@@ -0,0 +1,10 @@</span>
-			<span class="add">+World = require &quot;../support/worlds&quot;</span>
-			<span class="add">+module.exports = -&gt;</span>
-			<span class="add">+	@Before (done)-&gt;</span>
-			<span class="add">+		# opening a browser is like entering a whole new world...</span>
-			<span class="add">+		@world = World.get()</span>
-			<span class="add">+		done()</span>
-			<span class="add">+</span>
-			<span class="add">+	@After (done)-&gt;</span>
-			<span class="add">+		@world?.destroy()</span>
-			<span class="add">+		done()</span>
-
-		</pre>
+		<p>At this point, I really don't know how to test Bootstrap, except checking for a couple sentinal values - is the viewport set? Is page.css returned? Any thoughts would be greatly appreciated.</p>
 	</div>
 
 	<div class="commit">
@@ -796,24 +486,9 @@
 			<span class="nrm">src/server/server.coffee    | 21 </span><span class="add">++++++++++++++++</span><span class="rem">-----</span>
 			<span class="nrm">src/server/test/port.coffee | 34 </span><span class="add">++++++++++++++++++++++++++++++++++</span>
 			<span class="nrm">3 files changed, 52 insertions(+), 6 deletions(-)</span>
-
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/package.json b/package.json</span>
-			<span class="nfo">@@ -30,7 +30,8 @@</span>
-			<span class="nrm"> &quot;grunt-contrib-less&quot;: &quot;~0.7.0&quot;,</span>
-			<span class="nrm"> &quot;grunt-contrib-cssmin&quot;: &quot;~0.6.1&quot;,</span>
-			<span class="nrm"> &quot;grunt-contrib-uglify&quot;: &quot;~0.2.2&quot;,</span>
-			<span class="rem">-    &quot;marked&quot;: &quot;~0.2.9&quot;</span>
-			<span class="add">+    &quot;marked&quot;: &quot;~0.2.9&quot;,</span>
-			<span class="add">+    &quot;nconf&quot;: &quot;~0.6.7&quot;</span>
-			<span class="nrm">},</span>
-			<span class="nrm">&quot;dependencies&quot;: {</span>
-			<span class="nrm"> &quot;express&quot;: &quot;~3.3.5&quot;</span>
-		</pre>
-
+		<p>The app is starting to come together very nicely, so it's time to refactor and add a couple features to the server we'll need for deployment, especially configuring the listening port.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
@@ -851,7 +526,6 @@
 			<span class="add">+	stop: -&gt;</span>
 			<span class="add">+		server?.close()</span>
 		</pre>
-
 
 		<pre>
 			<span class="wrn">diff --git a/src/server/test/port.coffee b/src/server/test/port.coffee</span>

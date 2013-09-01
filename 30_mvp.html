@@ -306,6 +306,8 @@
 			<span class="add">+</span>
 			<span class="add">+	isDestroyed: -&gt; _destroyed</span>
 		</pre>
+
+		<p>The actual test is a bit of math, which takes the shortcut of cheking the left side of the element under question, instead of doing two divisions for the midpoint. The world has some Q deferreds to tippy toe around getting three seperate async operations to coalesce into a single result.</p>
 	</div>
 
 	<div class="commit">
@@ -422,9 +424,9 @@
 		<pre>
 			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
 			<span class="nfo">@@ -4,6 +4,10 @@</span> app = express()
-			<span class="nrm">
-		root = path.join __dirname, &quot;..&quot;, &quot;..&quot;</span>
-
+			<span class="nrm"></span>
+			<span class="nrm">root = path.join __dirname, &quot;..&quot;, &quot;..&quot;</span>
+			<span class="nrm"></span>
 			<span class="add">+app.get '/page.css', (req, res)-&gt;</span>
 			<span class="add">+	res.set &quot;content-type&quot;, &quot;text/css&quot;</span>
 			<span class="add">+	res.sendfile path.join root, &quot;build&quot;, &quot;page.css&quot;</span>
@@ -439,18 +441,18 @@
 			<span class="nfo">@@ -7,8 +7,9 @@</span> get = (path, d, cb)-&gt;
 			<span class="nrm">		cb e, r, b</span>
 			<span class="nrm">		d()</span>
-
+			<span class="nrm"></span>
 			<span class="rem">-index = (d, cb)-&gt; get &quot;http://localhost:3000/&quot;, d, cb</span>
 			<span class="add">+index  = (d, cb)-&gt; get &quot;http://localhost:3000/&quot;, d, cb</span>
 			<span class="nrm">bundle = (d, cb)-&gt; get &quot;http://localhost:3000/bundle.js&quot;, d, cb</span>
 			<span class="add">+styles = (d, cb)-&gt; get &quot;http://localhost:3000/page.css&quot;, d, cb</span>
-			<span class="nrm">
-		Callbacks =</span>
+			<span class="nrm"></span>
+			<span class="nrm">Callbacks =</span>
 			<span class="nrm">	OK: (e, res)-&gt;</span>
 			<span class="nfo">@@ -55,6 +56,10 @@</span> describe &quot;Server&quot;, -&gt;
 			<span class="nrm">				should.exist matches</span>
 			<span class="nrm">				matches[1].should.match /to-do/</span>
-
+			<span class="nrm"></span>
 			<span class="add">+		it &quot;sets a viewport&quot;, (done)-&gt;</span>
 			<span class="add">+			index done, (e, r, body)-&gt;</span>
 			<span class="add">+				body.should.match /&lt;meta[^&gt;]+name=&quot;viewport&quot;/</span>
@@ -461,7 +463,7 @@
 			<span class="nfo">@@ -69,6 +74,14 @@</span> describe &quot;Server&quot;, -&gt;
 			<span class="nrm">					angular\.module\(&quot;todo&quot;</span>
 			<span class="nrm">				///</span>
-
+			<span class="nrm"></span>
 			<span class="add">+	describe &quot;page.css&quot;, -&gt;</span>
 			<span class="add">+		it &quot;returns a stylesheet&quot;, (done)-&gt;</span>
 			<span class="add">+			styles done, Callbacks.OK</span>
@@ -578,45 +580,10 @@
 			<span class="nrm">src/features/behavior/users/edith/Edith.feature | 12 </span><span class="add">++++++++++++</span>
 			<span class="nrm">src/features/behavior/users/jason/Jason.feature |  1 </span><span class="rem">-</span>
 			<span class="nrm">4 files changed, 32 insertions(+), 1 deletion(-)</span>
-
 		</pre>
 
 
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
-			<span class="nfo">@@ -75,3 +75,13 @@</span> module.exports = -&gt;
-			<span class="nrm">			text.should.match ///#{content}///</span>
-			<span class="nrm">			done()</span>
-			<span class="nrm">		.catch done</span>
-			<span class="add">+</span>
-			<span class="add">+	###</span>
-			<span class="add">+	Ensure lack of content in the body.</span>
-			<span class="add">+	###</span>
-			<span class="add">+	@Then /page does not show &quot;([^&quot;]+)&quot;/, (content, done)-&gt;</span>
-			<span class="add">+		@world.text(&quot;body&quot;)</span>
-			<span class="add">+		.then (text)-&gt;</span>
-			<span class="add">+			text.should.not.match ///#{content}///</span>
-			<span class="add">+			done()</span>
-			<span class="add">+		.catch done</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/todo.coffee b/src/features/behavior/steps/todo.coffee</span>
-			<span class="wrn">new file mode 100644</span>
-			<span class="nfo">@@ -0,0 +1,10 @@</span>
-			<span class="add">+Q = require 'q'</span>
-			<span class="add">+should = require &quot;should&quot;</span>
-			<span class="add">+module.exports = -&gt;</span>
-			<span class="add">+	@When /remove(?:s?) the first todo/, (what, done)-&gt;</span>
-			<span class="add">+		@world.click(&quot;.remove:nth-of-type(1)&quot;)</span>
-			<span class="add">+		.then -&gt;</span>
-			<span class="add">+			debugger;</span>
-			<span class="add">+			done()</span>
-			<span class="add">+		# .catch (e)-&gt;</span>
-			<span class="add">+		# 	done(e)</span>
-		</pre>
-
+		<p>Still don't have the removing items feature for the MVP. I think it's pretty useless to have a todo list that I can't finish anything on, so here's the tests for implementing that.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/features/behavior/users/edith/Edith.feature b/src/features/behavior/users/edith/Edith.feature</span>
@@ -641,15 +608,38 @@
 			<span class="nrm">	# explanatory text to that effect.</span>
 		</pre>
 
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/steps/todo.coffee b/src/features/behavior/steps/todo.coffee</span>
+			<span class="wrn">new file mode 100644</span>
+			<span class="nfo">@@ -0,0 +1,10 @@</span>
+			<span class="add">+Q = require 'q'</span>
+			<span class="add">+should = require &quot;should&quot;</span>
+			<span class="add">+module.exports = -&gt;</span>
+			<span class="add">+	@When /remove(?:s?) the first todo/, (what, done)-&gt;</span>
+			<span class="add">+		@world.click(&quot;.remove:nth-of-type(1)&quot;)</span>
+			<span class="add">+		.then -&gt;</span>
+			<span class="add">+			debugger;</span>
+			<span class="add">+			done()</span>
+			<span class="add">+		# .catch (e)-&gt;</span>
+			<span class="add">+		# 	done(e)</span>
+		</pre>
 
 		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/users/jason/Jason.feature b/src/features/behavior/users/jason/Jason.feature</span>
-			<span class="nfo">@@ -1,4 +1,3 @@</span>
-			<span class="rem">-@current</span>
-			<span class="nrm">Feature: Site looks nice</span>
-			<span class="nrm">	As a user of our side</span>
-			<span class="nrm">	Jason wants the site to be pleasant to use</span>
-
+			<span class="wrn">diff --git a/src/features/behavior/steps/browsing.coffee b/src/features/behavior/steps/browsing.coffee</span>
+			<span class="nfo">@@ -75,3 +75,13 @@</span> module.exports = -&gt;
+			<span class="nrm">			text.should.match ///#{content}///</span>
+			<span class="nrm">			done()</span>
+			<span class="nrm">		.catch done</span>
+			<span class="add">+</span>
+			<span class="add">+	###</span>
+			<span class="add">+	Ensure lack of content in the body.</span>
+			<span class="add">+	###</span>
+			<span class="add">+	@Then /page does not show &quot;([^&quot;]+)&quot;/, (content, done)-&gt;</span>
+			<span class="add">+		@world.text(&quot;body&quot;)</span>
+			<span class="add">+		.then (text)-&gt;</span>
+			<span class="add">+			text.should.not.match ///#{content}///</span>
+			<span class="add">+			done()</span>
+			<span class="add">+		.catch done</span>
 		</pre>
 	</div>
 
@@ -665,6 +655,25 @@
 
 		</pre>
 
+		<p>With the behaviors in place, time to implement the removal in the Angular code. First the tests, then the implementation.</p>
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/unit.coffee b/src/client/todo/unit.coffee</span>
+			<span class="nfo">@@ -21,6 +21,14 @@</span> describe &quot;todo controller&quot;, -&gt;
+			<span class="nrm">		expect($scope.todos[0]).toEqual(&quot;Todo 1&quot;, &quot;Correct Todo was added&quot;)</span>
+			<span class="nrm">		expect($scope.Todos.current).toEqual(&quot;&quot;, &quot;Resets current todo&quot;)</span>
+			<span class="add">+	it &quot;can remove todo&quot;, -&gt;</span>
+			<span class="add">+		$scope.Todos.current = &quot;Todo 1&quot;</span>
+			<span class="add">+		$scope.Todos.add()</span>
+			<span class="add">+		$scope.Todos.current = &quot;Todo 2&quot;</span>
+			<span class="add">+		$scope.Todos.add()</span>
+			<span class="add">+		$scope.Todos.remove(&quot;Todo 1&quot;)</span>
+			<span class="add">+		expect($scope.todos).toEqual([&quot;Todo 2&quot;], &quot;One todo left.&quot;)</span>
+			<span class="add">+</span>
+			<span class="nrm">	describe &quot;localStorage&quot;, -&gt;</span>
+			<span class="nrm">		it &quot;saves to local storage&quot;, -&gt;</span>
+			<span class="nrm">			$scope.Todos.current = &quot;Todo 1&quot;</span>
+		</pre>
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
@@ -676,20 +685,18 @@
 			<span class="add">+			$scope.todos.splice $scope.todos.indexOf(todo), 1</span>
 		</pre>
 
-
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/style.less b/src/client/todo/style.less</span>
 			<span class="nfo">@@ -4,3 +4,7 @@</span>
 			<span class="nrm"> margin-top: 2ex;</span>
 			<span class="nrm"> width: 100%;</span>
-		}
+			<span class="nrm">}</span>
 			<span class="add">+</span>
 			<span class="add">+.remove {</span>
 			<span class="add">+	margin-top: 2px;</span>
 			<span class="add">+}</span>
 			<span class="nrm">\ No newline at end of file</span>
 		</pre>
-
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/template.jade b/src/client/todo/template.jade</span>
@@ -706,27 +713,6 @@
 			<span class="add">+					span.glyphicon.glyphicon-ok</span>
 			<span class="nrm">\ No newline at end of file</span>
 		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/client/todo/unit.coffee b/src/client/todo/unit.coffee</span>
-			<span class="nfo">@@ -21,6 +21,14 @@</span> describe &quot;todo controller&quot;, -&gt;
-			<span class="nrm">		expect($scope.todos[0]).toEqual(&quot;Todo 1&quot;, &quot;Correct Todo was added&quot;)</span>
-			<span class="nrm">		expect($scope.Todos.current).toEqual(&quot;&quot;, &quot;Resets current todo&quot;)</span>
-
-			<span class="add">+	it &quot;can remove todo&quot;, -&gt;</span>
-			<span class="add">+		$scope.Todos.current = &quot;Todo 1&quot;</span>
-			<span class="add">+		$scope.Todos.add()</span>
-			<span class="add">+		$scope.Todos.current = &quot;Todo 2&quot;</span>
-			<span class="add">+		$scope.Todos.add()</span>
-			<span class="add">+		$scope.Todos.remove(&quot;Todo 1&quot;)</span>
-			<span class="add">+		expect($scope.todos).toEqual([&quot;Todo 2&quot;], &quot;One todo left.&quot;)</span>
-			<span class="add">+</span>
-			<span class="nrm">	describe &quot;localStorage&quot;, -&gt;</span>
-			<span class="nrm">		it &quot;saves to local storage&quot;, -&gt;</span>
-			<span class="nrm">			$scope.Todos.current = &quot;Todo 1&quot;</span>
-
-		</pre>
 	</div>
 
 	<div class="commit">
@@ -736,24 +722,9 @@
 			<span class="nrm">src/server/server.coffee      | 3 </span><span class="add">+++</span>
 			<span class="nrm">src/server/test/serves.coffee | 6 </span><span class="add">++++++</span>
 			<span class="nrm">2 files changed, 9 insertions(+)</span>
-
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
-			<span class="nfo">@@ -16,6 +16,9 @@</span> app =
-			<span class="nrm">			res.set &quot;content-type&quot;, &quot;text/css&quot;</span>
-			<span class="nrm">			res.sendfile path.join root, &quot;build&quot;, &quot;page.css&quot;</span>
-
-			<span class="add">+		.get '/fonts/:font', (req, res)-&gt;</span>
-			<span class="add">+			res.sendfile path.join root, &quot;bower_components&quot;, &quot;bootstrap&quot;, &quot;fonts&quot;, req.params.font</span>
-			<span class="add">+</span>
-			<span class="nrm">		.get '/bundle.js', (req, res)-&gt;</span>
-			<span class="nrm">			res.set &quot;content-type&quot;, &quot;text/javascript&quot;</span>
-			<span class="nrm">			res.sendfile path.join root, &quot;build&quot;, &quot;bundle.js&quot;</span>
-		</pre>
-
+		<p>What's with all that jumbled markings in the remove button? Turns out Glyphicons are a font family, that we aren't serving any more. That's easy to fix.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/server/test/serves.coffee b/src/server/test/serves.coffee</span>
@@ -768,8 +739,23 @@
 			<span class="add">+				res.statusCode.should.equal 200</span>
 			<span class="add">+				done()</span>
 			<span class="nrm">\ No newline at end of file</span>
-
 		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/src/server/server.coffee b/src/server/server.coffee</span>
+			<span class="nfo">@@ -16,6 +16,9 @@</span> app =
+			<span class="nrm">			res.set &quot;content-type&quot;, &quot;text/css&quot;</span>
+			<span class="nrm">			res.sendfile path.join root, &quot;build&quot;, &quot;page.css&quot;</span>
+			<span class="nrm"></span>
+			<span class="add">+		.get '/fonts/:font', (req, res)-&gt;</span>
+			<span class="add">+			res.sendfile path.join root, &quot;bower_components&quot;, &quot;bootstrap&quot;, &quot;fonts&quot;, req.params.font</span>
+			<span class="add">+</span>
+			<span class="nrm">		.get '/bundle.js', (req, res)-&gt;</span>
+			<span class="nrm">			res.set &quot;content-type&quot;, &quot;text/javascript&quot;</span>
+			<span class="nrm">			res.sendfile path.join root, &quot;build&quot;, &quot;bundle.js&quot;</span>
+		</pre>
+
+		<p>At this point, I can use (and have been using) the app to keep track of the list of things I want to do next. That's pretty awesome!</p>
 	</div>
 
 	<div class="commit">
@@ -781,100 +767,16 @@
 			<span class="nrm">.../behavior/support/worlds/protractor.coffee       | 16 </span><span class="add">+++++++++</span><span class="rem">-------</span>
 			<span class="nrm">src/features/behavior/users/edith/Edith.feature     | 21 </span><span class="add">++++++++++++++++++</span><span class="rem">---</span>
 			<span class="nrm">4 files changed, 33 insertions(+), 19 deletions(-)</span>
-
 		</pre>
 
-
-		<pre>
-			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
-			<span class="nfo">@@ -6,11 +6,11 @@</span> todo.service &quot;storage&quot;, -&gt;
-			<span class="nrm">
-		todo.controller &quot;todo&quot;, ($scope, storage)-&gt;</span>
-			<span class="nrm">	$scope.todos = storage.get()</span>
-			<span class="add">+	$scope.$watch 'todos', -&gt; storage.set $scope.todos</span>
-			<span class="nrm">	Todos = $scope.Todos =</span>
-			<span class="nrm">		current: &quot;&quot;</span>
-			<span class="rem">-		add: -&gt;</span>
-			<span class="add">+		add: -&gt; $scope.$apply -&gt;</span>
-			<span class="nrm">			$scope.todos.push Todos.current</span>
-			<span class="nrm">			Todos.current = &quot;&quot;</span>
-			<span class="rem">-			storage.set $scope.todos</span>
-			<span class="rem">-		remove: (todo)-&gt;</span>
-			<span class="add">+		remove: (todo)-&gt; $scope.$apply -&gt;</span>
-			<span class="nrm">			$scope.todos.splice $scope.todos.indexOf(todo), 1</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/steps/todo.coffee b/src/features/behavior/steps/todo.coffee</span>
-			<span class="nfo">@@ -1,10 +1,7 @@</span>
-			<span class="nrm">Q = require 'q'</span>
-			<span class="nrm">should = require &quot;should&quot;</span>
-			<span class="nrm">module.exports = -&gt;</span>
-			<span class="rem">-	@When /remove(?:s?) the first todo/, (what, done)-&gt;</span>
-			<span class="add">+	@When /remove(?:s?) the first todo/, (done)-&gt;</span>
-			<span class="nrm">		@world.click(&quot;.remove:nth-of-type(1)&quot;)</span>
-			<span class="rem">-		.then -&gt;</span>
-			<span class="rem">-			debugger;</span>
-			<span class="rem">-			done()</span>
-			<span class="rem">-		# .catch (e)-&gt;</span>
-			<span class="rem">-		# 	done(e)</span>
-			<span class="add">+		.then -&gt; done()</span>
-			<span class="add">+		.catch done</span>
-		</pre>
-
-
-		<pre>
-			<span class="wrn">diff --git a/src/features/behavior/support/worlds/protractor.coffee b/src/features/behavior/support/worlds/protractor.coffee</span>
-			<span class="nfo">@@ -6,13 +6,13 @@</span> By = Protractor.By
-			<span class="nrm">
-		_destroyed = false</span>
-			<span class="nrm">module.exports = class World</span>
-			<span class="rem">-	constructor: -&gt;</span>
-			<span class="add">+	constructor: (browser=&quot;firefox&quot;)-&gt;</span>
-			<span class="nrm">		@driver = new webdriver.Builder().</span>
-			<span class="nrm">			usingServer('http://localhost:4444/wd/hub').</span>
-			<span class="rem">-			withCapabilities(webdriver.Capabilities.firefox()).build();</span>
-			<span class="add">+			withCapabilities(webdriver.Capabilities[browser]()).build()</span>
-
-			<span class="rem">-		@driver.manage().timeouts().setScriptTimeout(10000);</span>
-			<span class="rem">-		@ptor = Protractor.wrapDriver(@driver);</span>
-			<span class="add">+		@driver.manage().timeouts().setScriptTimeout(100)</span>
-			<span class="add">+		@ptor = Protractor.wrapDriver(@driver)</span>
-			<span class="nrm"></span>
-			<span class="nrm">visit: (url)-&gt;</span>
-			<span class="nrm">		Q @ptor.get(url)</span>
-			<span class="nfo">@@ -35,9 +35,7 @@</span> module.exports = class World
-			<span class="nrm">	fill: (what, value, submit = false)-&gt;</span>
-			<span class="nrm">		input = @ptor.findElement(By.name(what))</span>
-			<span class="nrm">		deferred = input.sendKeys(value)</span>
-			<span class="rem">-		if submit</span>
-			<span class="rem">-			deferred.then -&gt;</span>
-			<span class="rem">-				input.submit()</span>
-			<span class="add">+		input.submit()  if submit</span>
-			<span class="nrm">		Q deferred</span>
-			<span class="nrm"></span>
-			<span class="nrm">coords: (elem)-&gt;</span>
-			<span class="nfo">@@ -52,6 +50,10 @@</span> module.exports = class World
-			<span class="nrm">					width: size.width</span>
-			<span class="nrm">					left: location.x</span>
-
-			<span class="add">+	click: (what)-&gt;</span>
-			<span class="add">+		debugger</span>
-			<span class="add">+		Q @find(what).click()</span>
-			<span class="add">+</span>
-			<span class="nrm">	destroy: (done)-&gt;</span>
-			<span class="nrm">		_destroyed = true</span>
-			<span class="nrm">		@driver.quit()</span>
-		</pre>
-
+		<p>And while using the app, I found a bug! It doesn't save the things we've removed! This calls for adding bot unit and behavior tests, to ensure it doesn't regress.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/features/behavior/users/edith/Edith.feature b/src/features/behavior/users/edith/Edith.feature</span>
 			<span class="nfo">@@ -48,9 +48,11 @@</span> Feature: Site loads
 			<span class="nrm">		Then the page does not show &quot;Buy peacock feathers&quot;</span>
 			<span class="nrm">		And the page shows &quot;Use peacock feathers to make a fly&quot;</span>
-
+			<span class="nrm"></span>
 			<span class="rem">-	# Edith wonders whether the site will remember her list. Then she sees</span>
 			<span class="rem">-	# that the site has generated a unique URL for her -- there is some</span>
 			<span class="rem">-	# explanatory text to that effect.</span>
@@ -903,7 +805,86 @@
 			<span class="add">+		When she goes to the &quot;saved&quot; url</span>
 			<span class="add">+		Then the page does not show &quot;Buy peacock feathers&quot;</span>
 			<span class="add">+		And the page shows &quot;Use peacock feathers to make a fly&quot;</span>
+		</pre>
 
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/steps/todo.coffee b/src/features/behavior/steps/todo.coffee</span>
+			<span class="nfo">@@ -1,10 +1,7 @@</span>
+			<span class="nrm">Q = require 'q'</span>
+			<span class="nrm">should = require &quot;should&quot;</span>
+			<span class="nrm">module.exports = -&gt;</span>
+			<span class="rem">-	@When /remove(?:s?) the first todo/, (what, done)-&gt;</span>
+			<span class="add">+	@When /remove(?:s?) the first todo/, (done)-&gt;</span>
+			<span class="nrm">		@world.click(&quot;.remove:nth-of-type(1)&quot;)</span>
+			<span class="rem">-		.then -&gt;</span>
+			<span class="rem">-			debugger;</span>
+			<span class="rem">-			done()</span>
+			<span class="rem">-		# .catch (e)-&gt;</span>
+			<span class="rem">-		# 	done(e)</span>
+			<span class="add">+		.then -&gt; done()</span>
+			<span class="add">+		.catch done</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/src/features/behavior/support/worlds/protractor.coffee b/src/features/behavior/support/worlds/protractor.coffee</span>
+			<span class="nfo">@@ -6,13 +6,13 @@</span> By = Protractor.By
+			<span class="nrm">_destroyed = false</span>
+			<span class="nrm">module.exports = class World</span>
+			<span class="rem">-	constructor: -&gt;</span>
+			<span class="add">+	constructor: (browser=&quot;firefox&quot;)-&gt;</span>
+			<span class="nrm">		@driver = new webdriver.Builder().</span>
+			<span class="nrm">			usingServer('http://localhost:4444/wd/hub').</span>
+			<span class="rem">-			withCapabilities(webdriver.Capabilities.firefox()).build();</span>
+			<span class="add">+			withCapabilities(webdriver.Capabilities[browser]()).build()</span>
+			<span class="nrm">
+			<span class="rem">-		@driver.manage().timeouts().setScriptTimeout(10000);</span>
+			<span class="rem">-		@ptor = Protractor.wrapDriver(@driver);</span>
+			<span class="add">+		@driver.manage().timeouts().setScriptTimeout(100)</span>
+			<span class="add">+		@ptor = Protractor.wrapDriver(@driver)</span>
+			<span class="nrm"></span>
+			<span class="nrm">visit: (url)-&gt;</span>
+			<span class="nrm">		Q @ptor.get(url)</span>
+			<span class="nfo">@@ -35,9 +35,7 @@</span> module.exports = class World
+			<span class="nrm">	fill: (what, value, submit = false)-&gt;</span>
+			<span class="nrm">		input = @ptor.findElement(By.name(what))</span>
+			<span class="nrm">		deferred = input.sendKeys(value)</span>
+			<span class="rem">-		if submit</span>
+			<span class="rem">-			deferred.then -&gt;</span>
+			<span class="rem">-				input.submit()</span>
+			<span class="add">+		input.submit()  if submit</span>
+			<span class="nrm">		Q deferred</span>
+			<span class="nrm"></span>
+			<span class="nrm">coords: (elem)-&gt;</span>
+			<span class="nfo">@@ -52,6 +50,10 @@</span> module.exports = class World
+			<span class="nrm">					width: size.width</span>
+			<span class="nrm">					left: location.x</span>
+			<span class="nrm"></span>
+			<span class="add">+	click: (what)-&gt;</span>
+			<span class="add">+		debugger</span>
+			<span class="add">+		Q @find(what).click()</span>
+			<span class="add">+</span>
+			<span class="nrm">	destroy: (done)-&gt;</span>
+			<span class="nrm">		_destroyed = true</span>
+			<span class="nrm">		@driver.quit()</span>
+		</pre>
+
+		<pre>
+			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
+			<span class="nfo">@@ -6,11 +6,11 @@</span> todo.service &quot;storage&quot;, -&gt;
+			<span class="nrm">
+			<span class="nrm">todo.controller &quot;todo&quot;, ($scope, storage)-&gt;</span>
+			<span class="nrm">	$scope.todos = storage.get()</span>
+			<span class="add">+	$scope.$watch 'todos', -&gt; storage.set $scope.todos</span>
+			<span class="nrm">	Todos = $scope.Todos =</span>
+			<span class="nrm">		current: &quot;&quot;</span>
+			<span class="rem">-		add: -&gt;</span>
+			<span class="add">+		add: -&gt; $scope.$apply -&gt;</span>
+			<span class="nrm">			$scope.todos.push Todos.current</span>
+			<span class="nrm">			Todos.current = &quot;&quot;</span>
+			<span class="rem">-			storage.set $scope.todos</span>
+			<span class="rem">-		remove: (todo)-&gt;</span>
+			<span class="add">+		remove: (todo)-&gt; $scope.$apply -&gt;</span>
+			<span class="nrm">			$scope.todos.splice $scope.todos.indexOf(todo), 1</span>
 		</pre>
 	</div>
 
@@ -914,9 +895,9 @@
 			<span class="nrm">src/client/todo/module.coffee | 16 </span><span class="add">+++++++++</span><span class="rem">-------</span>
 			<span class="nrm">src/client/todo/unit.coffee   |  3 </span><span class="add">+++</span>
 			<span class="nrm">2 files changed, 12 insertions(+), 7 deletions(-)</span>
-
 		</pre>
 
+		<p>That was a relatively large change to the client codebase, and introduced some redundancy. Refactoring that out with an Angular <code>$scope.$watch</code>, and running the tests to verify nothing broke.</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/module.coffee b/src/client/todo/module.coffee</span>
@@ -947,7 +928,6 @@
 			<span class="add">+			todos.splice todos.indexOf(todo), 1</span>
 		</pre>
 
-
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/unit.coffee b/src/client/todo/unit.coffee</span>
 			<span class="nfo">@@ -17,6 +17,7 @@</span> describe &quot;todo controller&quot;, -&gt;
@@ -965,7 +945,7 @@
 			<span class="add">+		$scope.$digest()</span>
 			<span class="nrm">		$scope.Todos.remove(&quot;Todo 1&quot;)</span>
 			<span class="nrm">		expect($scope.todos).toEqual([&quot;Todo 2&quot;], &quot;One todo left.&quot;)</span>
-
+			<span class="nrm"></span>
 			<span class="nfo">@@ -33,6 +35,7 @@</span> describe &quot;todo controller&quot;, -&gt;
 			<span class="nrm">		it &quot;saves to local storage&quot;, -&gt;</span>
 			<span class="nrm">			$scope.Todos.current = &quot;Todo 1&quot;</span>
@@ -974,7 +954,6 @@
 			<span class="nrm">			expect(window.localStorage['TDD-ToDos']).toBeDefined(&quot;TDD-ToDos were created on localStorage&quot;)</span>
 			<span class="nrm">			stored = window.localStorage['TDD-ToDos']</span>
 			<span class="nrm">			expect(stored).toEqual('[&quot;Todo 1&quot;]', &quot;Saves array of todos&quot;)</span>
-
 		</pre>
 	</div>
 
@@ -985,15 +964,15 @@
 			<span class="nrm">src/client/todo/style.less    | 10 </span><span class="add">+++++++++</span><span class="rem">-</span>
 			<span class="nrm">src/client/todo/template.jade |  2 </span><span class="add">+</span><span class="rem">-</span>
 			<span class="nrm">2 files changed, 10 insertions(+), 2 deletions(-)</span>
-
 		</pre>
 
+		<p>Some quick animations to spice things up, and the app's a minimal viable product!</p>
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/style.less b/src/client/todo/style.less</span>
 			<span class="nfo">@@ -7,4 +7,12 @@</span>
 			<span class="nrm">
-		.remove {</span>
+			<span class="nrm">.remove {</span>
 			<span class="nrm">	margin-top: 2px;</span>
 			<span class="rem">-}</span>
 			<span class="nrm">\ No newline at end of file</span>
@@ -1007,7 +986,6 @@
 			<span class="add">+	}</span>
 			<span class="add">+}</span>
 		</pre>
-
 
 		<pre>
 			<span class="wrn">diff --git a/src/client/todo/template.jade b/src/client/todo/template.jade</span>

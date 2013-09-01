@@ -51,6 +51,7 @@ pre {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
 
 	padding: 1px 9px 8px;
+	margin-top: 19px;
 }
 
 .commit h3 {

@@ -11,6 +11,10 @@ As a node developer, I want a rock-solid continuous deployment infrastructure so
 
 As a technologist, I want to play with bleeding edge technologies so that I can squeeze the most out of their potential.
 
+### How? (Was the code written)
+
+I've written a running commentary on the commit log. <a href="http://davidsouther.github.io/tdd-angular/">Follow along</a> to see the full development process.
+
 ### What (Technologies)
 
 The entire stack is Javascript, with one deploy script in bash that really should be rewritten to JS. The JSis written in Coffeescript where possible, which is pretty much everywhere.

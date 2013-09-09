@@ -23,6 +23,10 @@ app =
 			res.set "content-type", "text/javascript"
 			res.sendfile path.join root, "build", "bundle.js"
 
+		.get '/context.json', (req, res)->
+			res.set "content-type", "application/json"
+			res.sendfile path.join root, "build", "context.json"
+
 		.get '/bower/:module/:file', (req, res)->
 			res.set "content-type", "text/javascript"
 			res.sendfile path.join root, "bower_components", req.params.module, req.params.file

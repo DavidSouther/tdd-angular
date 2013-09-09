@@ -93,8 +93,8 @@ describe "Server", ->
 				done()
 
 	describe "JEFRi", ->
-		it "serves a JEFRi context", ->
-			request "http://localhost:3000/context", (e, res)->
+		it "serves a JEFRi context", (done)->
+			request "http://localhost:3000/context.json", (e, res)->
 				res.statusCode.should.equal 200
-				res.headers["content-type"].should.equal "text/css"
+				res.headers["content-type"].should.equal "application/json"
 				done()

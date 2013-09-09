@@ -1,0 +1,45 @@
+{"attributes":{},"entities":{
+	"Todo": {
+		"key": "todo_id",
+		"properties": {
+			"todo_id": {
+				"type": "string"
+			},
+			"list_id": {
+				"type": "string"
+			},
+			"todo": {
+				"type": "string"
+			}
+		},
+		"relationships": {
+			"list": {
+				"type": "has_a",
+				"property": "list_id",
+				"to": {
+					"type": "List",
+					"property": "list_id"
+				},
+				"back": "todos"
+			}
+		}
+	},
+	"List": {
+		"key": "list_id",
+		"properties": {
+			"list_id": {
+				"type": "string"
+			}
+		},
+		"relationships": {
+			"todos": {
+				"type": "has_many",
+				"property": "list_id",
+				"to": {
+					"type": "Todo",
+					"property": "list_id"
+				}
+			}
+		}
+	}
+}}`

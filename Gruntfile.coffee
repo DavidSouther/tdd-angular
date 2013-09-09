@@ -13,8 +13,15 @@ module.exports = (grunt)->
 	It watches some types of files, and composes some high-level helper tasks.
 	###
 
-	grunt.NpmTasks = [ "grunt-contrib-watch" ]
+	grunt.NpmTasks = [
+		"grunt-contrib-watch"
+		"grunt-contrib-copy"
+	]
 	grunt.Config =
+		copy:
+			context:
+				files:
+					'build/context.json': 'src/context.json'
 		watch:
 			base:
 				files:[
@@ -37,6 +44,7 @@ module.exports = (grunt)->
 
 	grunt.registerTask "base", "Perform a base level of production, up to but not including features.", [
 		'build'
+		'copy:context'
 		'karma:unit'
 		'mochaTest:server'
 	]

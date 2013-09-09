@@ -91,3 +91,10 @@ describe "Server", ->
 			request "http://localhost:3000/fonts/glyphicons-halflings-regular.woff", (e, res)->
 				res.statusCode.should.equal 200
 				done()
+
+	describe "JEFRi", ->
+		it "serves a JEFRi context", ->
+			request "http://localhost:3000/context", (e, res)->
+				res.statusCode.should.equal 200
+				res.headers["content-type"].should.equal "text/css"
+				done()

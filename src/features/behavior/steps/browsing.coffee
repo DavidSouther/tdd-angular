@@ -17,7 +17,8 @@ module.exports = ->
 		@world.visit(server)
 		.then(done)
 
-	@When /goes to the "([^"]*)" url/, (url, done)->
+	@When /goes to the "([^"]*)" url( in a new browser)?/, (url, fresh, done)->
+		@world.clear()  if fresh
 		@world.visit(server)
 		.then(done)
 

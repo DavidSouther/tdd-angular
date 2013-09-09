@@ -20,6 +20,9 @@ module.exports = class World
 	reload: ->
 		Q @ptor.reload()
 
+	clear: ->
+		Q @ptor.executeScript "window.localStorage.clear()"
+
 	find: (selector)->
 		@ptor.findElement By.css selector
 

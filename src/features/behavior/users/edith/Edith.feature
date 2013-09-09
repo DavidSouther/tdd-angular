@@ -36,7 +36,6 @@ Feature: Site loads
 		And the page shows "Use peacock feathers to make a fly"
 		And she should be invited to enter another "to-do" item
 
-	@current
 	Scenario: Finishes a todo
 		Given Edith is on the landing page
 		And she enters into a "to-do" box
@@ -79,3 +78,17 @@ Feature: Todo lists save
 		When she goes to the "saved" url
 		Then the page does not show "Buy peacock feathers"
 		And the page shows "Use peacock feathers to make a fly"
+
+	@current
+	Scenario: Saves list in a new session
+		Given Edith is on the landing page
+		And she enters into a "to-do" box
+			"""
+			Buy peacock feathers
+			Use peacock feathers to make a fly
+			"""
+		And she leaves the page
+		When she goes to the "saved" url in a new browser
+		Then the page shows "Buy peacock feathers"
+		And the page shows "Use peacock feathers to make a fly"
+		And she should be invited to enter another "to-do" item

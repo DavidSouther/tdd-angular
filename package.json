@@ -38,7 +38,9 @@
     "coffee-script": "~1.6.3",
     "express": "~3.3.5",
     "bower": "~1.2.5",
-    "nconf": "~0.6.7"
+    "nconf": "~0.6.7",
+    "jefri-stores": "~1.0.0",
+    "jefri": "~1.1.1"
   },
   "engines": {
     "node": "0.10.x",

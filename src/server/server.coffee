@@ -9,9 +9,36 @@ nconf.argv()
 	.defaults
 		PORT: 3000
 
+JEFRi = require "jefri"
+Stores = require "jefri-stores"
+
+runtime = new JEFRi.Runtime ""
+store = new JEFRi.Stores.FileStore runtime: runtime
+process.nextTick -> runtime.load "http://localhost:#{nconf.get 'PORT'}/context.json"
+
 express = require "express"
 app =
 	express()
+		.use(express.bodyParser())
+
+		## JEFRi resources
+		.get '/context.json', (req, res)->
+			res.set "content-type", "application/json"
+			res.sendfile path.join root, "build", "context.json"
+
+		.post '/persist', (req, res)->
+			transaction = new JEFRi.Transaction()
+			transaction.add req.body.entities, true
+			store.persist(transaction)
+			.then (gotten)->
+				res.jsonp gotten
+
+		## Bower resources, probably moving to CDN
+		.get '/bower/:module/:file', (req, res)->
+			res.set "content-type", "text/javascript"
+			res.sendfile path.join root, "bower_components", req.params.module, req.params.file
+
+		## Bundle files
 		.get '/page.css', (req, res)->
 			res.set "content-type", "text/css"
 			res.sendfile path.join root, "build", "page.css"
@@ -22,14 +49,6 @@ app =
 		.get '/bundle.js', (req, res)->
 			res.set "content-type", "text/javascript"
 			res.sendfile path.join root, "build", "bundle.js"
-
-		.get '/context.json', (req, res)->
-			res.set "content-type", "application/json"
-			res.sendfile path.join root, "build", "context.json"
-
-		.get '/bower/:module/:file', (req, res)->
-			res.set "content-type", "text/javascript"
-			res.sendfile path.join root, "bower_components", req.params.module, req.params.file
 
 		.get '/', (req, res)->
 			res.sendfile path.join root, "build", "index.html"

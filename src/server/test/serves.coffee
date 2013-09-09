@@ -98,3 +98,13 @@ describe "Server", ->
 				res.statusCode.should.equal 200
 				res.headers["content-type"].should.equal "application/json"
 				done()
+
+		it "reponds to persist requests", (done)->
+			request {
+					uri: "http://localhost:3000/persist"
+					method: 'post'
+					json: {attributes:{}, entities:[]}
+				},
+				(e, res)->
+					res.statusCode.should.equal 200
+					done()

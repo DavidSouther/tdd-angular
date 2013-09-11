@@ -39,6 +39,9 @@ app =
 			res.set "content-type", "text/javascript"
 			res.sendfile path.join root, "bower_components", req.params.module, req.params.file
 
+		.get /^\/vendor/, (req, res)->
+			res.sendfile path.join root, req.path
+
 		## Bundle files
 		.get '/page.css', (req, res)->
 			res.set "content-type", "text/css"

@@ -92,6 +92,12 @@ describe "Server", ->
 				res.statusCode.should.equal 200
 				done()
 
+	describe "vendors", ->
+		it "serves from vendors", (done)->
+			request "http://localhost:3000/vendor/jefri/lib/jefri.min.js", (e, res)->
+				res.statusCode.should.equal 200
+				done()
+
 	describe "JEFRi", ->
 		it "serves a JEFRi context", (done)->
 			request "http://localhost:3000/context.json", (e, res)->

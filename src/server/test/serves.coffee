@@ -108,3 +108,13 @@ describe "Server", ->
 				(e, res)->
 					res.statusCode.should.equal 200
 					done()
+
+		it "returns persisted data", (done)->
+			request {
+					uri: "http://localhost:3000/get"
+					method: 'post'
+					json: {attributes:{}, entities:[]}
+				},
+				(e, res)->
+					res.statusCode.should.equal 200
+					done()

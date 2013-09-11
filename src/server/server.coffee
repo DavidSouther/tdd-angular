@@ -26,10 +26,11 @@ app =
 			res.set "content-type", "application/json"
 			res.sendfile path.join root, "build", "context.json"
 
-		.post '/persist', (req, res)->
+		.post /\/(get|persist)/, (req, res)->
+			method = req.params[0]
 			transaction = new JEFRi.Transaction()
 			transaction.add req.body.entities, true
-			store.persist(transaction)
+			store[method](transaction)
 			.then (gotten)->
 				res.jsonp gotten
 

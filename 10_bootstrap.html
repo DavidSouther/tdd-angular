@@ -109,6 +109,28 @@
 
 		<p>This is an incredibly primitive first feature, more a hello world than an app, but it does give us experience with our first two technologies: <a href="http://gruntjs.com">Grunt JS</a> for running tasks and <a href="https://github.com/cucumber/cucumber-js">CucumberJS</a> for running cucumber specs in the NodeJS environment.</p>
 
+		<p>When we run the grunt file at this point, we get an expected error:</p>
+
+		<pre>
+			<span class="nrm">Running "cucumberjs:Edith" (cucumberjs) task</span>
+			<span class="nrm">.connect ECONNREFUSED Error: connect ECONNREFUSED</span>
+			<span class="nrm">    at errnoException (net.js:901:11)</span>
+			<span class="nrm">    at Object.afterConnect [as oncomplete] (net.js:892:19)</span>
+			<span class="nrm">F-</span>
+
+			<span class="nrm">(::) failed steps (::)</span>
+
+			<span class="nrm">Error: connect ECONNREFUSED</span>
+			<span class="nrm">    at errnoException (net.js:901:11)</span>
+			<span class="nrm">    at Object.afterConnect [as oncomplete] (net.js:892:19)</span>
+
+			<span class="nrm">Failing scenarios:</span>
+			<span class="nrm">/home/southerd/devel/southerd/tdd/angular/tdd-angular/test/behavior/users/edith/Edith.feature:6 # Scenario: Direct Browsing</span>
+
+			<span class="nrm">1 scenario (1 failed)</span>
+			<span class="nrm">3 steps (1 failed, 1 skipped, 1 passed)</span>
+		</pre>
+
 		<p>Moving on, the most basic server that still returns HTML.</p>
 	</div>
 

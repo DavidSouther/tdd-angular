@@ -10,7 +10,7 @@ describe "todo controller", ->
 		angular.module("todo").service "storage", ->
 			store = []
 			get: -> store
-			put: (TDs)-> store = TDs
+			save: (TDs)-> store = TDs
 	beforeEach loadScope
 	afterEach -> delete window.localStorage['TDD-ToDos']
 
@@ -36,5 +36,3 @@ describe "todo controller", ->
 		$scope.$digest()
 		$scope.Todos.remove("Todo 1")
 		expect($scope.todos).toEqual(["Todo 2"], "One todo left.")
-
-describe "todo storage", ->

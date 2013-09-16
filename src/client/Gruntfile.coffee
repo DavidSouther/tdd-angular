@@ -35,12 +35,9 @@ module.exports = (grunt)->
 					]
 					singleRun: true
 					files: [
-						'bower_components/q/q.js'
 						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js"
 						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-animate.js"
 						"http://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-mocks.js"
-						'http://underscorejs.org/underscore-min.js'
-						'vendor/jefri/lib/jefri.min.js'
 						"build/bundle.js"
 						"src/client/**/unit.coffee"
 					]

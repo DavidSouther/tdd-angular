@@ -3,8 +3,14 @@ loadScope = inject ($rootScope, $controller)->
 	$scope = $rootScope.$new()
 	$controller "todo", {$scope}
 
+
 describe "todo controller", ->
 	beforeEach module "todo"
+	beforeEach ->
+		angular.module("todo").service "storage", ->
+			store = []
+			get: -> store
+			put: (TDs)-> store = TDs
 	beforeEach loadScope
 	afterEach -> delete window.localStorage['TDD-ToDos']
 
@@ -31,19 +37,4 @@ describe "todo controller", ->
 		$scope.Todos.remove("Todo 1")
 		expect($scope.todos).toEqual(["Todo 2"], "One todo left.")
 
-	describe "localStorage", ->
-		it "saves to local storage", ->
-			$scope.Todos.current = "Todo 1"
-			$scope.Todos.add()
-			$scope.$digest()
-			expect(window.localStorage['TDD-ToDos']).toBeDefined("TDD-ToDos were created on localStorage")
-			stored = window.localStorage['TDD-ToDos']
-			expect(stored).toEqual('["Todo 1"]', "Saves array of todos")
-
-		describe "load", ->
-			beforeEach ->
-				window.localStorage['TDD-ToDos'] = '["Todo 1"]'
-				loadScope()
-
-			it "restores from local storage", ->
-				expect($scope.todos).toEqual(["Todo 1"], "Loaded one saved todo")
+describe "todo storage", ->

@@ -17,6 +17,7 @@ module.exports = (grunt)->
 		"grunt-contrib-watch"
 		"grunt-contrib-copy"
 	]
+
 	grunt.Config =
 		copy:
 			context:

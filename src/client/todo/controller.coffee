@@ -1,12 +1,22 @@
 angular.module('todo').controller "todo", ($scope, storage)->
-	$scope.todos = storage.get()
+	watchExp = (entity)->
+		lastModified = 0
+		entity.on 'modified', ->
+			lastModified = new Date / 1e3
+		-> lastModified
+
 	save = (newV, oldV) ->
 		storage.save()
-	$scope.$watch 'todos', save, true
+	storage.ready.then (list)->
+		$scope.list = list
+		# $scope.$watch watchExp(list), save, true
+		$scope.$watch "list._status() != 'PERSISTED'", save, true
+
 	Todos = $scope.Todos =
 		current: ""
 		add: ->
-			$scope.todos.push Todos.current
+			todo = storage.runtime.build "Todo", {todo: Todos.current}
+			todo.list = $scope.list
 			Todos.current = ""
 		remove: (todo)->
-			$scope.todos.splice $scope.todos.indexOf(todo), 1
+			todo._destroy()

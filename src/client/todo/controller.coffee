@@ -10,7 +10,7 @@ angular.module('todo').controller "todo", ($scope, storage)->
 	storage.ready.then (list)->
 		$scope.list = list
 		# $scope.$watch watchExp(list), save, true
-		$scope.$watch "list._status() != 'PERSISTED'", save, true
+		$scope.$watch "list._modified._count", save, true
 
 	Todos = $scope.Todos =
 		current: ""

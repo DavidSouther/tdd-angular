@@ -1,9 +1,8 @@
 angular.module('todo').service "storage", ($location, $q)->
 	todos = null
 
-	base = "#{$location.protocol()}://#{$location.host()}:#{$location.port()}"
-	runtime = new JEFRi.Runtime "#{base}/context.json"
-	store = new JEFRi.Stores.PostStore base
+	base = "#{$location.protocol()}://#{$location.host()}:#{$location.port()}/"
+	runtime = new JEFRi.Runtime "#{base}context.json"
 	loading = $q.defer()
 
 	storage =
@@ -18,7 +17,11 @@ angular.module('todo').service "storage", ($location, $q)->
 		todos = runtime.build "List"
 		storage.get = -> todos
 		storage.save = ->
-			runtime.save_all store
+			t = new window.JEFRi.Transaction()
+			t.add todos
+			t.add todo for todo in todos.todos
+			s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
+			s.execute 'persist', t
 		loading.resolve todos
 	.catch ->
 		console.error "Couldn't load context!"

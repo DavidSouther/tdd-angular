@@ -1,4 +1,4 @@
-angular.module('todo').service "storage", ($location, $q)->
+angular.module('todo').service "storage", ($location, $q, $rootScope)->
 	todos = null
 
 	base = "#{$location.protocol()}://#{$location.host()}:#{$location.port()}/"
@@ -12,17 +12,28 @@ angular.module('todo').service "storage", ($location, $q)->
 		ready: loading.promise
 
 	runtime.ready.then ->
-		# TODO replace with loading todos list
+		t = new window.JEFRi.Transaction()
+		t.add _type: 'List', 'todos': {}
+		s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
 
-		todos = runtime.build "List"
-		storage.get = -> todos
-		storage.save = ->
-			t = new window.JEFRi.Transaction()
-			t.add todos
-			t.add todo for todo in todos.todos
-			s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
-			s.execute 'persist', t
-		loading.resolve todos
+		s.execute('get', t)
+		.then (list)->
+			if list.entities.length
+				runtime.expand list.entities
+				todos = runtime.find('List')[0]
+			else
+				todos = runtime.build ('List')
+
+			storage.get = -> todos
+			storage.save = ->
+				t = new window.JEFRi.Transaction()
+				t.add todos
+				t.add todo for todo in todos.todos
+				s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
+				s.execute 'persist', t
+
+			loading.resolve todos # Why doesn't resolving $q trigger a digest?
+			$rootScope.$digest()
 	.catch ->
 		console.error "Couldn't load context!"
 	storage

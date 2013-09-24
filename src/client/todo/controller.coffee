@@ -19,4 +19,6 @@ angular.module('todo').controller "todo", ($scope, storage)->
 			todo.list = $scope.list
 			Todos.current = ""
 		remove: (todo)->
+			# TODO fix _destroy()
+			$scope.list.todos.remove todo
 			todo._destroy()

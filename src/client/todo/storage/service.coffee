@@ -1,39 +1,70 @@
 angular.module('todo').service "storage", ($location, $q, $rootScope)->
-	todos = null
-
 	base = "#{$location.protocol()}://#{$location.host()}:#{$location.port()}/"
 	runtime = new JEFRi.Runtime "#{base}context.json"
 	loading = $q.defer()
 
 	storage =
 		get: ->
-		save: ->
+		save: (e = null)->
 		runtime: runtime
 		ready: loading.promise
+		store: new window.JEFRi.Stores.PostStore({remote: base, runtime})
 
-	runtime.ready.then ->
-		t = new window.JEFRi.Transaction()
+	###
+	Return a new Transaction
+	###
+	prep = -> new window.JEFRi.Transaction()
+
+	###
+	Load the user's list from the data store.
+	###
+	loadList = ->
+		t = prep()
+		# Request all lists from the server
 		t.add _type: 'List', 'todos': {}
-		s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
 
-		s.execute('get', t)
+		storage.store.execute('get', t)
 		.then (list)->
 			if list.entities.length
-				runtime.expand list.entities
-				todos = runtime.find('List')[0]
+				runtime.find('List')[0]
 			else
-				todos = runtime.build ('List')
+				throw new Exception "List not found"
 
-			storage.get = -> todos
-			storage.save = ->
-				t = new window.JEFRi.Transaction()
-				t.add todos
-				t.add todo for todo in todos.todos
-				s = new window.JEFRi.Stores.PostStore({remote: base, runtime})
-				s.execute 'persist', t
+		.catch (e)->
+			console.warn e
+			# Build a new list, since one wasn't found!
+			runtime.build ('List')
 
-			loading.resolve todos # Why doesn't resolving $q trigger a digest?
-			$rootScope.$digest()
-	.catch ->
+		.then (todos)->
+			# Allow saving!
+			storage.save = (e = null)->
+				t = prep()
+				if e
+					t.add e
+				else
+					t.add todos
+					t.add todo for todo in todos.todos
+				storage.store.execute 'persist', t
+			todos
+
+	contextError = (e)->
 		console.error "Couldn't load context!"
+		console.log e
+		# Do something smart...
+		# like tell the user there's been a data error
+		# or fall back to local storage
+
+	finishedLoading = (todos)->
+		storage.get = -> todos
+		loading.resolve todos # why doesn't resolving $q trigger a digest?
+		$rootScope.$digest()
+
+	###
+	After the runtime has finished loading, get some data for it!
+	###
+	runtime.ready
+	.then(loadList)
+	.then(finishedLoading, contextError)
+
 	storage
+ 

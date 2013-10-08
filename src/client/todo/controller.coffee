@@ -17,4 +17,6 @@ angular.module('todo').controller "todo", ($scope, storage)->
 			# Remove the todo from the list, incidentally unsetting todo's list_id
 			$scope.list.todos.remove todo
 			# Save the todo with no list_id, then destroy the todo.
-			storage.save(todo).then -> todo._destroy()
+			storage.save(todo).then ->
+				console.log todo
+				todo._destroy()

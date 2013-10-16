@@ -51,10 +51,9 @@ module.exports = class World
 					left: location.x
 
 	click: (what)->
-		debugger
 		Q @find(what).click()
 
-	destroy: (done)->
+	destroy: ->
 		_destroyed = true
 		@driver.quit()
 

@@ -3,16 +3,18 @@ should = require "should"
 World = require "../support/worlds"
 
 module.exports = ->
+	require('qcumber')(@)
+
 	###
 	Check for bootstap on the page...
 	####
-	@Then /^bootstrap is loaded$/, (done)->
-		done() # No idea how to test this...
+	@Then /^bootstrap is loaded$/, ->
+		true # No idea how to test this...
 
 	###
 	Verify an element is "centered"
 	###
-	@Then /the "([^"]+)" is centered/, (elem, done)->
+	@Then /the "([^"]+)" is centered/, (elem)->
 		@world.coords(elem)
 		.then (coords)->
 			# The expected position is how far "left" the element should be
@@ -25,6 +27,3 @@ module.exports = ->
 			tolerance = 0.05 * coords.window.width
 			# The error should be less than some tolerance
 			absolute.should.be.lessThan tolerance, "centering #{elem}"
-		.then(->done())
-		.catch(done)
-

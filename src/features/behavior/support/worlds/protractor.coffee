@@ -8,10 +8,10 @@ _destroyed = false
 module.exports = class World
 	constructor: (browser="firefox")->
 		@driver = new webdriver.Builder().
-			usingServer('http://localhost:4444/wd/hub').
+			usingServer(process.env.SELENIUM_HUB).
 			withCapabilities(webdriver.Capabilities[browser]()).build()
 
-		@driver.manage().timeouts().setScriptTimeout(1000)
+		@driver.manage().timeouts().setScriptTimeout(10000)
 		@ptor = Protractor.wrapDriver(@driver)
 
 	visit: (url)->

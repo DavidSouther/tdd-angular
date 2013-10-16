@@ -35,27 +35,15 @@ module.exports = (grunt)->
 
 	grunt.NpmTasks = [
 		"grunt-cucumber"
-		"grunt-shell-spawn"
+		"grunt-selenium-launcher"
 	]
 
 	grunt.registerTask "features", "Run all feature behaviors, except those tagged @broken.", [
-		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
-		"shell:install"
-		"shell:selenium"
-		"shell:sleep"
+		'selenium-launch'
 		"cucumberjs:all"
-		"shell:selenium:kill"
-		"shell:kill" # Also has the effect of killing driven browsers.
 	]
 
 	grunt.registerTask "feature", "Runs feature behaviors tagged @current.", [
-		"shell:kill" # Clean up any old selenium servers, or other programs who may be hogging 4444
-		"shell:install"
-		"shell:selenium"
-		# Start the application server
-		"shell:sleep"
+		'selenium-launch'
 		"cucumberjs:current"
-		# Stop the application server
-		"shell:selenium:kill"
-		"shell:kill" # Also has the effect of killing driven browsers.
 	]

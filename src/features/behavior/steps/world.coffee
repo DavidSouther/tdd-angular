@@ -6,5 +6,4 @@ module.exports = ->
 		done()
 
 	@After (done)->
-		@world?.destroy()
-		done()
+		@world?.destroy().then(done)

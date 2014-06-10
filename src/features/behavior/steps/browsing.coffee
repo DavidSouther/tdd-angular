@@ -6,15 +6,11 @@ module.exports = ->
 
 	@Given /has (?:his|her|a) browser open$/, -> true
 
-	@Given /has entered a "([^"]*)" item/, (value)->
-		@world.visit("http://localhost:3000/")
-		.then(=>@world.fill(value, value, true))
-
 	@Given /(?:on|goes to|visits) the (?:site|landing page)(?: directly)?/, ->
 		@world.visit("http://localhost:3000/")
 
-	@When /goes to the "([^"]*)" url/, (url)->
-		@world.visit("http://localhost:3000/")
+	@When /browses to "([^"]*)" url/, (url)->
+		@world.visit(url)
 
 	@Given /leaves the page/, ->
 		@world.visit("http://localhost:3000/")

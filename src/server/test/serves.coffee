@@ -7,7 +7,7 @@ get = (path, d, cb)->
 		cb e, r, b
 		d()
 
-index  = (d, cb)-> get "http://localhost:3000/", d, cb
+index  = (d, cb)-> get "http://localhost:#{process.env.PORT || 3000}/#{process.env.APP || ''}", d, cb
 bundle = (d, cb)-> get "http://localhost:3000/bundle.js", d, cb
 styles = (d, cb)-> get "http://localhost:3000/page.css", d, cb
 

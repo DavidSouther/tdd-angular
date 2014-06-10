@@ -1,4 +1,3 @@
-nconf = require "nconf"
 should = require "should"
 server = require "../server"
 request = require "request"
@@ -8,7 +7,7 @@ get = (path, d, cb)->
 		cb e, r, b
 		d()
 
-port = 3030
+
 
 index  = (d, cb)-> get "http://localhost:#{port}/", d, cb
 Callbacks =

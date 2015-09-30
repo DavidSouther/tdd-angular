@@ -9,7 +9,7 @@
 
 ### [Why?](1) (for a NodeJS stack)
 
-As a node developer, I want a rock-solid continuous deployment infrastructure so that I can return to my projects later and continue adding new features without accidentaly breaking code I wrote years ago.
+As a node developer, I want a rock-solid continuous deployment infrastructure so that I can return to my projects later and continue adding new features without accidentally breaking code I wrote years ago.
 
 As a technologist, I want to play with bleeding edge technologies so that I can squeeze the most out of their potential.
 

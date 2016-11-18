@@ -131,10 +131,10 @@ Copyright 2013 David Souther
 [6]: https://npmjs.org/package/selenium-webdriver
 [7]: https://github.com/angular/protractor
 [8]: http://expressjs.com/
-[9]: http://visionmedia.github.io/mocha/
+[9]: http://mochajs.org/
 [10]: http://angularjs.org/
 [11]: http://karma-runner.github.io/0.10/index.html
-[12]: http://pivotal.github.io/jasmine/
+[12]: https://jasmine.github.io/
 [13]: https://travis-ci.org/
 [14]: https://dashboard.heroku.com/apps
 [15]: http://coffeescript.org/
